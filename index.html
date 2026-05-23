@@ -21,9 +21,12 @@
     const user = await r.json();
     window.__user = user;
     document.documentElement.style.visibility = 'visible';
-    document.addEventListener('DOMContentLoaded', function() {
-      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
-    });
+    var fireReady = function() { document.dispatchEvent(new CustomEvent('auth-ready', { detail: user })); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireReady);
+    } else {
+      fireReady();
+    }
   } catch {
     location.replace('/login.html?return=' + encodeURIComponent(location.pathname + location.search));
   }

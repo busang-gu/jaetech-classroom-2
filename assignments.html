@@ -17,9 +17,12 @@
     const user = await r.json();
     window.__user = user;
     document.documentElement.style.visibility = 'visible';
-    document.addEventListener('DOMContentLoaded', function() {
-      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
-    });
+    var fireReady = function() { document.dispatchEvent(new CustomEvent('auth-ready', { detail: user })); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireReady);
+    } else {
+      fireReady();
+    }
   } catch {
     location.replace('/login.html?return=' + encodeURIComponent(location.pathname + location.search));
   }
@@ -382,7 +385,7 @@ main { padding: 28px 0 80px; }
       <a href="./">강의실</a>
       <a href="./assignments.html" class="active">과제 게시판</a>
       <span class="nav-user">
-        <span class="nick">홍길동</span>
+        <span class="nick">…</span>
         <a href="#" id="logout-btn">로그아웃</a>
       </span>
     </nav>

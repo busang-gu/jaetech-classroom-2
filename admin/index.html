@@ -21,9 +21,12 @@
     }
     window.__user = user;
     document.documentElement.style.visibility = 'visible';
-    document.addEventListener('DOMContentLoaded', function() {
-      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
-    });
+    var fireReady = function() { document.dispatchEvent(new CustomEvent('auth-ready', { detail: user })); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireReady);
+    } else {
+      fireReady();
+    }
   } catch {
     location.replace('/login.html?return=' + encodeURIComponent(location.pathname));
   }
@@ -477,7 +480,7 @@ main { padding: 0 0 60px; }
       <a href="#">제출물 모음</a>
       <a href="../">강의실 보기</a>
       <span class="nav-user">
-        <span class="nick">부상구</span>
+        <span class="nick">…</span>
         <a href="#" id="logout-btn">로그아웃</a>
       </span>
     </nav>
