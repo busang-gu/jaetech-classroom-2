@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1주차 과제 제출 — 재테크 라운지 강의실</title>
+<meta name="description" content="재테크 라운지 2기 1주차 과제 — 내 자산 그릇 점검하기.">
+<meta name="robots" content="noindex, nofollow">
+
+<!-- 인증 게이트 -->
+<style id="auth-gate-style">html { visibility: hidden; }</style>
+<script>
+(async function authGate() {
+  try {
+    const r = await fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' });
+    if (!r.ok) throw new Error('unauth');
+    const user = await r.json();
+    window.__user = user;
+    document.documentElement.style.visibility = '';
+    document.addEventListener('DOMContentLoaded', function() {
+      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
+    });
+  } catch {
+    location.replace('/login.html?return=' + encodeURIComponent(location.pathname + location.search));
+  }
+})();
+</script>
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+<style>
+:root {
+  --color-primary: #3B82F6;
+  --color-primary-dark: #1E40AF;
+  --color-primary-soft: #DBEAFE;
+  --color-secondary: #7ED957;
+  --color-secondary-dark: #5A9E3F;
+  --color-secondary-soft: #DCFCE7;
+  --color-accent: #FFD700;
+  --color-accent-dark: #D4A017;
+  --color-urgent: #EF4444;
+  --color-urgent-soft: #FEF2F2;
+
+  --surface-base: #FFFFFF;
+  --surface-subtle: #F8FAFC;
+  --surface-soft: #FFF9F0;
+  --surface-green-soft: #F0FAE9;
+  --surface-blue-soft: #EFF6FF;
+  --surface-dark: #0D1B2A;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  --border-subtle: rgba(15,23,42,.08);
+  --border-soft: #E2E8F0;
+  --border-medium: #CBD5E1;
+
+  --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 2px 6px rgba(15,23,42,.04);
+  --shadow-md: 0 4px 12px rgba(15,23,42,.06), 0 2px 6px rgba(15,23,42,.04);
+  --shadow-lg: 0 12px 32px rgba(15,23,42,.10), 0 4px 10px rgba(15,23,42,.06);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--text-primary);
+  background: var(--surface-subtle);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+@media (min-width: 768px) { .wrap { padding: 0 32px; } }
+
+/* ===== Header ===== */
+.site-header {
+  background: var(--surface-base);
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.brand-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.brand {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.brand .dot {
+  color: var(--color-secondary-dark);
+}
+.brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.nav-links a:hover { color: var(--text-primary); }
+.nav-links a.active { color: var(--text-primary); font-weight: 800; }
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-left: 14px;
+  margin-left: 4px;
+  border-left: 1px solid var(--border-soft);
+}
+.nav-user .nick { font-weight: 700; color: var(--text-secondary); }
+.nav-user a { text-decoration: underline; font-size: 11px; color: var(--text-muted); }
+@media (max-width: 640px) {
+  .nav-links a:not(.active) { display: none; }
+}
+
+/* ===== Hero ===== */
+.task-hero {
+  background: linear-gradient(135deg, var(--surface-blue-soft) 0%, var(--surface-green-soft) 100%);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 36px 0 32px;
+}
+.task-hero .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.task-hero .breadcrumb a { color: var(--text-secondary); }
+.task-hero .breadcrumb a:hover { color: var(--text-primary); }
+.task-hero .crumb-sep { opacity: 0.4; }
+.task-hero .week-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+.task-hero h1 {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+@media (min-width: 768px) {
+  .task-hero h1 { font-size: 32px; }
+}
+.task-hero .sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.task-hero .deadline {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239,68,68,.10);
+  color: #B91C1C;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* ===== Progress ===== */
+.progress-section {
+  background: var(--surface-base);
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.progress-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
+  position: relative;
+}
+.progress-step .bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: 2px;
+}
+.progress-step.done .bar { background: var(--color-secondary); }
+.progress-step.active .bar { background: var(--color-primary); }
+.progress-step.done { color: var(--color-secondary-dark); }
+.progress-step.active { color: var(--color-primary-dark); }
+.progress-step .label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.progress-step.done .label::before { content: '✓'; color: var(--color-secondary-dark); font-weight: 900; }
+
+/* ===== Main ===== */
+main { padding: 28px 0 80px; }
+
+.section-card {
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 24px 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+@media (min-width: 768px) {
+  .section-card { padding: 30px 28px; }
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.section-num {
+  width: 26px; height: 26px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.section-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 4px 0 18px 36px;
+}
+
+/* ===== Tables ===== */
+.field-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+.field-table thead th {
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 12px;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.field-table thead th:last-child { text-align: right; }
+.field-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+.field-table tbody tr.group-header td {
+  background: var(--surface-subtle);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+}
+.field-table tbody tr.sum td {
+  background: var(--surface-soft);
+  font-weight: 800;
+}
+.field-table .label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.field-table .input-cell {
+  width: 220px;
+  text-align: right;
+}
+.field-table .unit-cell {
+  width: 60px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.field-table input[type="number"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  text-align: right;
+  background: var(--surface-base);
+  transition: border-color 0.15s, background 0.15s;
+}
+.field-table input[type="number"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--surface-blue-soft);
+}
+.field-table tr.sum input { background: transparent; border-color: transparent; cursor: default; }
+
+.net-worth-row {
+  margin-top: 18px;
+  background: linear-gradient(135deg, var(--surface-dark) 0%, #1B263B 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.net-worth-row .label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.02em;
+}
+.net-worth-row .value {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--color-accent);
+  letter-spacing: -0.01em;
+}
+.net-worth-row .value small {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* ===== Roadmap ===== */
+.roadmap-guide {
+  background: var(--surface-blue-soft);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--color-primary-dark);
+  line-height: 1.7;
+}
+.roadmap-guide b { font-weight: 800; }
+.roadmap-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.roadmap-table thead th {
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 12px;
+  text-align: left;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.roadmap-table tbody td {
+  padding: 6px 6px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+.roadmap-table .time-cell {
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  padding-left: 10px;
+  font-size: 13px;
+}
+.roadmap-table input[type="text"],
+.roadmap-table input[type="number"] {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface-base);
+  transition: border-color 0.15s, background 0.15s;
+}
+.roadmap-table input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--surface-blue-soft);
+}
+.roadmap-table .age-cell { width: 70px; }
+@media (max-width: 640px) {
+  .roadmap-table { font-size: 12px; }
+  .roadmap-table .time-cell { font-size: 12px; padding-left: 4px; }
+}
+
+/* ===== Proof (인증 글) ===== */
+.proof-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: var(--surface-base);
+  resize: vertical;
+  transition: border-color 0.15s, background 0.15s;
+}
+.proof-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--surface-blue-soft);
+}
+.proof-counter {
+  margin-top: 6px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.upload-area {
+  margin-top: 14px;
+  border: 2px dashed var(--border-medium);
+  border-radius: 12px;
+  padding: 22px 16px;
+  text-align: center;
+  background: var(--surface-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.upload-area:hover {
+  border-color: var(--color-primary);
+  background: var(--surface-blue-soft);
+}
+.upload-area .em { font-size: 28px; margin-bottom: 6px; opacity: 0.7; }
+.upload-area .ttl { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.upload-area .desc { font-size: 11px; color: var(--text-muted); }
+.upload-area input { display: none; }
+.upload-preview {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.upload-preview .preview-card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-subtle);
+}
+.upload-preview .preview-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.upload-preview .preview-card .remove {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* ===== Actions ===== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, var(--surface-subtle) 30%);
+  padding: 24px 0 0;
+  margin-top: 24px;
+}
+@media (min-width: 640px) {
+  .actions { flex-direction: row; justify-content: flex-end; }
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-ghost {
+  background: var(--surface-base);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-soft);
+}
+.btn-ghost:hover { background: var(--surface-subtle); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(59,130,246,.30);
+}
+.btn-primary:hover { box-shadow: 0 6px 18px rgba(59,130,246,.40); }
+
+.save-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
+}
+.save-status .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* ===== Misc ===== */
+.tip-note {
+  background: var(--surface-green-soft);
+  border-left: 3px solid var(--color-secondary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--color-secondary-dark);
+  line-height: 1.7;
+}
+.tip-note b { font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand-row">
+      <a href="./" class="brand">재테크 라운지<span class="dot">.</span></a>
+      <span class="brand-sub">강의실</span>
+    </div>
+    <nav class="nav-links">
+      <a href="./">강의실</a>
+      <a href="./assignments.html" class="active">과제 게시판</a>
+      <span class="nav-user">
+        <span class="nick">홍길동</span>
+        <a href="#" id="logout-btn">로그아웃</a>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="task-hero">
+  <div class="wrap">
+    <div class="breadcrumb">
+      <a href="./assignments.html">과제 게시판</a>
+      <span class="crumb-sep">›</span>
+      <span>1주차 과제 작성</span>
+    </div>
+    <span class="week-tag">WEEK 01</span>
+    <h1>🔹 내 자산 그릇 점검하기</h1>
+    <p class="sub">강의를 시청한 후, 본인 숫자로 직접 채워보세요. 정확하지 않아도 OK — 일단 채우는 게 시작이에요.</p>
+    <span class="deadline">⏰ 마감 6/7 (일) 23:59 · 미제출 시 강퇴</span>
+  </div>
+</section>
+
+<!-- ===== Progress ===== -->
+<section class="progress-section">
+  <div class="wrap">
+    <div class="progress-bar">
+      <div class="progress-step active">
+        <div class="bar"></div>
+        <div class="label">WEEK 01</div>
+      </div>
+      <div class="progress-step">
+        <div class="bar"></div>
+        <div class="label">WEEK 02</div>
+      </div>
+      <div class="progress-step">
+        <div class="bar"></div>
+        <div class="label">WEEK 03</div>
+      </div>
+      <div class="progress-step">
+        <div class="bar"></div>
+        <div class="label">WEEK 04</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <!-- ===== Section 1: 자산 현황표 ===== -->
+    <section class="section-card">
+      <div class="section-head">
+        <span class="section-num">1</span>
+        <h2 class="section-title">📊 자산 현황표</h2>
+      </div>
+      <p class="section-desc">본인의 자산·부채·소득·지출을 만원 단위로 채워주세요. 합계는 자동 계산돼요.</p>
+
+      <table class="field-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>금액</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 자산 -->
+          <tr class="group-header"><td colspan="3">자산 — 내가 가진 것</td></tr>
+          <tr>
+            <td class="label">예금 / 적금</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="asset"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">주식 / ETF</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="asset"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">연금 (퇴직·개인)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="asset"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">부동산 (현재 시세)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="asset"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">기타 자산</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="asset"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr class="sum">
+            <td class="label">▶ 자산 합계</td>
+            <td class="input-cell"><input type="number" readonly id="sum-asset" placeholder="0"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+
+          <!-- 부채 -->
+          <tr class="group-header"><td colspan="3">부채 — 내가 진 것</td></tr>
+          <tr>
+            <td class="label">주택담보대출</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="debt"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">신용대출 / 카드론</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="debt"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">기타 부채</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="debt"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr class="sum">
+            <td class="label">▶ 부채 합계</td>
+            <td class="input-cell"><input type="number" readonly id="sum-debt" placeholder="0"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+
+          <!-- 소득 -->
+          <tr class="group-header"><td colspan="3">소득 — 매달 들어오는 것</td></tr>
+          <tr>
+            <td class="label">월 세후 급여</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="income"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">기타 정기 수입</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="income"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr class="sum">
+            <td class="label">▶ 월 소득 합계</td>
+            <td class="input-cell"><input type="number" readonly id="sum-income" placeholder="0"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+
+          <!-- 지출 -->
+          <tr class="group-header"><td colspan="3">지출 — 매달 나가는 것</td></tr>
+          <tr>
+            <td class="label">고정 지출 (월세·관리비·보험 등)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="expense"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">변동 지출 (식비·교통·쇼핑 등)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="expense"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">저축 / 투자</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="expense"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr class="sum">
+            <td class="label">▶ 월 지출 합계</td>
+            <td class="input-cell"><input type="number" readonly id="sum-expense" placeholder="0"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="net-worth-row">
+        <span class="label">순자산 (자산 − 부채)</span>
+        <span class="value"><span id="net-worth">0</span><small>만원</small></span>
+      </div>
+
+      <div class="tip-note">
+        <b>💡 작성 팁</b> · 만원 단위로 입력하세요. 예: 5,000만원 → 5000. 정확하지 않아도 OK — 모르는 항목은 0으로 두고 다음에 다시 채워도 됩니다.
+      </div>
+    </section>
+
+    <!-- ===== Section 2: 통합 로드맵 ===== -->
+    <section class="section-card">
+      <div class="section-head">
+        <span class="section-num">2</span>
+        <h2 class="section-title">🗺 통합 로드맵 초안</h2>
+      </div>
+      <p class="section-desc">시간축에 마일스톤을 박아주세요. 4주 동안 같이 다듬어가는 초안이에요.</p>
+
+      <div class="roadmap-guide">
+        <b>① 자산 목표</b> — 예: 3년 후 순자산 1억, 5년 후 ETF 5천만원<br>
+        <b>② 내 집 마련 목표</b> — 예: 2027년 전세 → 2030년 매수<br>
+        <b>③ 은퇴 목표</b> — 몇 세에, 월 얼마로 살 건지 (정확하지 않아도 OK)
+      </div>
+
+      <table class="roadmap-table">
+        <thead>
+          <tr>
+            <th>시점</th>
+            <th>나이</th>
+            <th>자산 목표</th>
+            <th>내 집 마련</th>
+            <th>은퇴 / 기타</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time-cell">지금 (현재)</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder="현재 자산 상태"></td>
+            <td><input type="text" placeholder="현재 주거 상태"></td>
+            <td><input type="text" placeholder="—"></td>
+          </tr>
+          <tr>
+            <td class="time-cell">1년 후</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+          </tr>
+          <tr>
+            <td class="time-cell">3년 후</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+          </tr>
+          <tr>
+            <td class="time-cell">5년 후</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+          </tr>
+          <tr>
+            <td class="time-cell">10년 후</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+          </tr>
+          <tr>
+            <td class="time-cell">은퇴 시점</td>
+            <td class="age-cell"><input type="number" placeholder="—"></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+            <td><input type="text" placeholder=""></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== Section 3: 인증 글 ===== -->
+    <section class="section-card">
+      <div class="section-head">
+        <span class="section-num">3</span>
+        <h2 class="section-title">💬 인증 글 + 캡처</h2>
+      </div>
+      <p class="section-desc">위 양식을 채우면서 느낀 점·발견·고민을 자유롭게 적어주세요. 캡처나 사진을 첨부해도 좋아요.</p>
+
+      <textarea class="proof-textarea" id="proof-text" placeholder="예) 처음 자산을 정리해보니 생각보다 부채가 많아서 놀랐어요. 1년 안에 신용대출부터 정리하고 비상금부터 마련하려고 합니다..."></textarea>
+      <div class="proof-counter"><span id="char-count">0</span> / 1,000자</div>
+
+      <label class="upload-area" for="image-upload">
+        <div class="em">📎</div>
+        <div class="ttl">이미지 첨부 (선택)</div>
+        <div class="desc">캡처·손글씨 사진 등 — 최대 5장, 1장당 5MB 이하</div>
+        <input type="file" id="image-upload" multiple accept="image/*">
+      </label>
+      <div class="upload-preview" id="upload-preview"></div>
+    </section>
+
+    <!-- ===== Actions ===== -->
+    <div class="actions">
+      <button class="btn btn-ghost" id="btn-save-draft">임시 저장</button>
+      <button class="btn btn-primary" id="btn-submit">제출하기</button>
+    </div>
+    <div class="save-status" id="save-status">
+      <span class="dot"></span>최근 저장: 방금 전
+    </div>
+
+  </div>
+</main>
+
+<script>
+const WEEK = 1;
+let currentAssignment = null;
+const pendingFiles = []; // 아직 서버에 업로드 안 된 신규 이미지
+
+// ===== 합계 자동 계산 =====
+function sumGroup(group) {
+  let total = 0;
+  document.querySelectorAll(`input[data-group="${group}"]`).forEach(input => {
+    const v = parseFloat(input.value);
+    if (!isNaN(v)) total += v;
+  });
+  return total;
+}
+function recalc() {
+  const asset = sumGroup('asset');
+  const debt = sumGroup('debt');
+  const income = sumGroup('income');
+  const expense = sumGroup('expense');
+  document.getElementById('sum-asset').value = asset || '';
+  document.getElementById('sum-debt').value = debt || '';
+  document.getElementById('sum-income').value = income || '';
+  document.getElementById('sum-expense').value = expense || '';
+  document.getElementById('net-worth').textContent = (asset - debt).toLocaleString();
+}
+document.querySelectorAll('input[data-group]').forEach(input => {
+  input.addEventListener('input', recalc);
+});
+
+// ===== 글자 수 카운터 =====
+const proof = document.getElementById('proof-text');
+const counter = document.getElementById('char-count');
+function updateCharCount() {
+  counter.textContent = proof.value.length.toLocaleString();
+}
+proof.addEventListener('input', updateCharCount);
+
+// ===== 이미지 미리보기 + 업로드 대기 =====
+const upload = document.getElementById('image-upload');
+const previewEl = document.getElementById('upload-preview');
+
+function addPreviewCard({ src, file = null, dbId = null }) {
+  const card = document.createElement('div');
+  card.className = 'preview-card';
+  if (dbId) card.dataset.imageId = dbId;
+  if (file) {
+    card._file = file;
+    pendingFiles.push({ card, file });
+  }
+  card.innerHTML = `
+    <img src="${src}" alt="첨부 이미지">
+    <button type="button" class="remove" aria-label="삭제">×</button>
+  `;
+  card.querySelector('.remove').addEventListener('click', async () => {
+    if (dbId) {
+      try {
+        await fetch('/api/assignment-images?id=' + encodeURIComponent(dbId), { method: 'DELETE' });
+      } catch {}
+    }
+    // pendingFiles에서도 제거
+    const idx = pendingFiles.findIndex(p => p.card === card);
+    if (idx >= 0) pendingFiles.splice(idx, 1);
+    card.remove();
+  });
+  previewEl.appendChild(card);
+}
+
+upload.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files).slice(0, 5);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => addPreviewCard({ src: ev.target.result, file });
+    reader.readAsDataURL(file);
+  });
+  e.target.value = ''; // 동일 파일 재선택 허용
+});
+
+// ===== 폼 직렬화 / 복원 =====
+function collectFormData() {
+  const sumByGroup = (group) => Array.from(
+    document.querySelectorAll(`input[data-group="${group}"]`)
+  ).map(i => parseFloat(i.value) || 0);
+
+  const roadmapLabels = ['지금', '1년 후', '3년 후', '5년 후', '10년 후', '은퇴'];
+  const rows = document.querySelectorAll('.roadmap-table tbody tr');
+  const roadmap = [];
+  rows.forEach((tr, ri) => {
+    const inputs = tr.querySelectorAll('input');
+    roadmap.push({
+      time: roadmapLabels[ri] || '',
+      age: inputs[0]?.value || '',
+      asset_goal: inputs[1]?.value || '',
+      home_goal: inputs[2]?.value || '',
+      retire_goal: inputs[3]?.value || '',
+    });
+  });
+
+  return {
+    asset: sumByGroup('asset'),
+    debt: sumByGroup('debt'),
+    income: sumByGroup('income'),
+    expense: sumByGroup('expense'),
+    roadmap,
+  };
+}
+
+function fillForm(a) {
+  const fd = a.form_data || {};
+  const fillGroup = (group, values) => {
+    const inputs = document.querySelectorAll(`input[data-group="${group}"]`);
+    (values || []).forEach((v, i) => {
+      if (inputs[i] && v != null && v !== 0) inputs[i].value = v;
+    });
+  };
+  fillGroup('asset', fd.asset);
+  fillGroup('debt', fd.debt);
+  fillGroup('income', fd.income);
+  fillGroup('expense', fd.expense);
+
+  const rows = document.querySelectorAll('.roadmap-table tbody tr');
+  (fd.roadmap || []).forEach((row, ri) => {
+    const tr = rows[ri];
+    if (!tr) return;
+    const inputs = tr.querySelectorAll('input');
+    if (inputs[0]) inputs[0].value = row.age || '';
+    if (inputs[1]) inputs[1].value = row.asset_goal || '';
+    if (inputs[2]) inputs[2].value = row.home_goal || '';
+    if (inputs[3]) inputs[3].value = row.retire_goal || '';
+  });
+
+  proof.value = a.proof_text || '';
+
+  // 기존 이미지
+  if (a.assignment_images?.length) {
+    a.assignment_images.forEach(img => {
+      if (img.url) addPreviewCard({ src: img.url, dbId: img.id });
+    });
+  }
+
+  recalc();
+  updateCharCount();
+}
+
+// ===== Load existing =====
+async function loadAssignment() {
+  try {
+    const r = await fetch('/api/assignments?week=' + WEEK, { cache: 'no-store' });
+    if (!r.ok) return;
+    const { assignments } = await r.json();
+    if (assignments?.length) {
+      currentAssignment = assignments[0];
+      fillForm(currentAssignment);
+      if (currentAssignment.status === 'submitted') {
+        const status = document.getElementById('save-status');
+        status.innerHTML = '<span class="dot" style="background:#5A9E3F;"></span>제출 완료';
+      }
+    }
+  } catch (e) {
+    console.error('load failed', e);
+  }
+}
+
+// ===== Save =====
+async function saveAssignment(status) {
+  const body = {
+    week: WEEK,
+    status,
+    form_data: collectFormData(),
+    proof_text: proof.value,
+  };
+  const r = await fetch('/api/assignments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.error || 'save_failed');
+  }
+  const { assignment } = await r.json();
+  currentAssignment = assignment;
+
+  // 신규 이미지들 업로드
+  while (pendingFiles.length) {
+    const { card, file } = pendingFiles.shift();
+    try {
+      const dbId = await uploadImage(file, assignment.id);
+      if (dbId) card.dataset.imageId = dbId;
+    } catch (e) {
+      console.error('image upload failed', e);
+      card.style.border = '2px solid #EF4444';
+    }
+  }
+  return assignment;
+}
+
+async function uploadImage(file, assignmentId) {
+  // 1) signed URL 요청
+  const signRes = await fetch('/api/assignment-images', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'sign', assignment_id: assignmentId, filename: file.name }),
+  });
+  if (!signRes.ok) throw new Error('sign failed');
+  const { signed_url, storage_path } = await signRes.json();
+
+  // 2) Supabase Storage에 직접 PUT
+  const upRes = await fetch(signed_url, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'image/png' },
+    body: file,
+  });
+  if (!upRes.ok) throw new Error('upload failed');
+
+  // 3) DB에 등록
+  const regRes = await fetch('/api/assignment-images', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'register', assignment_id: assignmentId, storage_path }),
+  });
+  if (!regRes.ok) throw new Error('register failed');
+  const { image } = await regRes.json();
+  return image.id;
+}
+
+// ===== 버튼 =====
+document.getElementById('btn-save-draft').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-save-draft');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+  try {
+    await saveAssignment('draft');
+    const status = document.getElementById('save-status');
+    status.innerHTML = '<span class="dot"></span>저장됨: 방금 전';
+    btn.textContent = '저장됨 ✓';
+    setTimeout(() => { btn.textContent = '임시 저장'; btn.disabled = false; }, 1500);
+  } catch (e) {
+    alert('저장 실패: ' + e.message);
+    btn.textContent = '임시 저장';
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  if (!confirm('제출하시겠어요? 마감일까지는 다시 수정할 수 있어요.')) return;
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+  try {
+    await saveAssignment('submitted');
+    alert('제출 완료! 👏');
+    location.href = '/assignments.html';
+  } catch (e) {
+    alert('제출 실패: ' + e.message);
+    btn.textContent = '제출하기';
+    btn.disabled = false;
+  }
+});
+
+// ===== Auth ready =====
+document.addEventListener('auth-ready', (e) => {
+  const user = e.detail || {};
+  const nick = document.querySelector('.nav-user .nick');
+  if (nick) nick.textContent = user.nickname || '수강생';
+  loadAssignment();
+});
+
+document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  location.href = '/api/auth/logout';
+});
+</script>
+
+</body>
+</html>
