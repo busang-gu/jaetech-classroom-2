@@ -661,6 +661,10 @@ main { padding: 28px 0 80px; }
         <h2 class="section-title" id="template-notice-title">양식 다운로드</h2>
       </div>
       <p class="section-desc" id="template-notice-desc">아래 버튼으로 엑셀 양식을 다운로드받아 작성한 뒤, 캡처를 인증 글 영역에 첨부해주세요.</p>
+
+      <!-- 시트 구성 안내 (sheets 메타 있을 때만) -->
+      <div id="template-sheets" style="display:none; margin: 0 0 18px;"></div>
+
       <a id="template-download-btn" class="btn btn-primary" href="#" download style="display:inline-flex; align-items:center; gap:8px; padding:14px 22px; border-radius:12px; font-weight:800; font-size:14px;">📊 양식 다운로드</a>
     </section>
 
@@ -896,10 +900,23 @@ main { padding: 28px 0 80px; }
 <script>
 // ===== 주차 메타 (URL ?week 파라미터로 분기) =====
 const WEEK_META = {
-  1: { title: '🔹 내 자산 그릇 점검하기',                       sub: '강의를 시청한 후, 본인 숫자로 직접 채워보세요. 정확하지 않아도 OK — 일단 채우는 게 시작이에요.', due: '6/7', template: '내집도은퇴도_1주차_과제양식.xlsx', form: true },
-  2: { title: '🔹 평생 흔들리지 않는 자산 구조 — 은퇴 체력 만들기', sub: '양식을 다운로드받아 작성한 뒤, 캡처와 함께 인증 글을 올려주세요. 경제적 자유 역산 + 절세 그릇 + 포트폴리오 설계 3시트로 구성돼있어요.', due: '6/14', template: '내집도은퇴도_2주차_과제양식.xlsx', form: false },
-  3: { title: '🔹 내 집 마련 기초',                              sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/21', template: null, form: false },
-  4: { title: '🔹 나만의 똘똘한 1채 찾기',                       sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/28', template: null, form: false },
+  1: {
+    title: '🔹 내 자산 그릇 점검하기',
+    sub: '강의를 시청한 후, 본인 숫자로 직접 채워보세요. 정확하지 않아도 OK — 일단 채우는 게 시작이에요.',
+    due: '6/7', template: '내집도은퇴도_1주차_과제양식.xlsx', form: true,
+  },
+  2: {
+    title: '🔹 평생 흔들리지 않는 자산 구조 — 은퇴 체력 만들기',
+    sub: '엑셀 안에 3개 시트가 들어있어요. 다운로드받아 차례대로 채운 뒤 캡처와 함께 인증 글을 올려주세요.',
+    due: '6/14', template: '내집도은퇴도_2주차_과제양식.xlsx', form: false,
+    sheets: [
+      { emoji: '📊', name: '경제적 자유 역산 계산서', desc: '내 나이·소득·지출로 경제적 자유까지 필요한 GAP 자동 계산' },
+      { emoji: '🏦', name: '내 절세 그릇 점검표',     desc: 'CMA·종합위탁·ISA·연금저축 — 내 그릇 현황 + 새는 세금 추정' },
+      { emoji: '📈', name: '내 포트폴리오 2가지 설계', desc: '부동산용(단기·안전) + 나를 위한(장기·복리) 두 포트 설계' },
+    ],
+  },
+  3: { title: '🔹 내 집 마련 기초',          sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/21', template: null, form: false },
+  4: { title: '🔹 나만의 똘똘한 1채 찾기',   sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/28', template: null, form: false },
 };
 const WEEK = parseInt(new URLSearchParams(location.search).get('week') || '1', 10) || 1;
 const META = WEEK_META[WEEK] || WEEK_META[1];
@@ -933,6 +950,36 @@ const META = WEEK_META[WEEK] || WEEK_META[1];
     const btn = document.getElementById('template-download-btn');
     btn.href = './assignments/' + encodeURIComponent(META.template);
     btn.setAttribute('download', META.template);
+
+    // 시트 리스트 표시
+    if (META.sheets && META.sheets.length) {
+      const sheetsEl = document.getElementById('template-sheets');
+      sheetsEl.style.display = '';
+      sheetsEl.innerHTML = `
+        <div style="background: linear-gradient(180deg, #FAFCF7 0%, #F0FAE9 100%); border:1px solid rgba(126,217,87,0.32); border-radius:12px; padding:16px 18px 14px;">
+          <div style="font-size:11px; font-weight:800; color:#5A9E3F; letter-spacing:.04em; margin-bottom:10px;">📑 이 엑셀에 들어있는 ${META.sheets.length}개 시트</div>
+          <ol style="margin:0; padding-left:0; list-style:none; counter-reset:sheet;">
+            ${META.sheets.map(s => `
+              <li style="counter-increment:sheet; display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(126,217,87,0.22); font-size:13px; line-height:1.6;">
+                <span style="flex-shrink:0; width:22px; height:22px; background:#7ED957; color:#1A3D0E; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:11px;">${'${counter(sheet)}'}</span>
+                <span style="flex:1;">
+                  <b style="color:#1A3D0E; font-weight:800;">${s.emoji} ${s.name}</b>
+                  <br><span style="color:#475569; font-size:12px;">${s.desc}</span>
+                </span>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
+      `;
+      // CSS counter는 ::before로 처리해야 하므로 직접 번호 박는 방식으로 교체
+      const items = sheetsEl.querySelectorAll('li');
+      items.forEach((li, i) => {
+        const numSpan = li.querySelector('span:first-child');
+        if (numSpan) numSpan.textContent = String(i + 1);
+      });
+      // 마지막 줄 dashed 제거
+      if (items.length) items[items.length - 1].style.borderBottom = 'none';
+    }
   } else if (!showForm) {
     notice.style.display = '';
     document.getElementById('template-notice-title').textContent = '양식 준비 중';
