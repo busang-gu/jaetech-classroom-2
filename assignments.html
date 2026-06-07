@@ -451,8 +451,8 @@ main { padding: 28px 0 80px; }
 <script>
 // 주차 메타 (6/1 개강)
 const WEEKS = [
-  { n: 1, title: '🔹 내 자산 그릇 점검하기',                       unlock: '2026-05-31', due: '2026-06-07' },
-  { n: 2, title: '🔹 평생 흔들리지 않는 자산 구조 — 은퇴 체력 만들기', unlock: '2026-05-31', due: '2026-06-14' },
+  { n: 1, title: '🔹 내 자산 그릇 점검하기',                       unlock: '2026-05-31', due: '2026-06-07', template: '내집도은퇴도_1주차_과제양식.xlsx' },
+  { n: 2, title: '🔹 평생 흔들리지 않는 자산 구조 — 은퇴 체력 만들기', unlock: '2026-05-31', due: '2026-06-14', template: '내집도은퇴도_2주차_과제양식.xlsx' },
   { n: 3, title: '🔹 내 집 마련 기초',                              unlock: '2026-06-15', due: '2026-06-21' },
   { n: 4, title: '🔹 나만의 똘똘한 1채 찾기',                       unlock: '2026-06-22', due: '2026-06-28' },
 ];
@@ -505,6 +505,11 @@ function renderWeekCard(meta, assignment, status) {
   let preview = '';
   let metaExtra = '';
 
+  // 양식 다운로드 버튼 (template 있고 잠금 해제 상태일 때만)
+  const tplBtn = (meta.template && status !== 'locked')
+    ? `<a class="btn btn-ghost btn-sm" href="./assignments/${encodeURIComponent(meta.template)}" download="${escapeHtml(meta.template)}" title="양식 다운로드">📥 양식</a>`
+    : '';
+
   if (status === 'submitted') {
     statusBadge = `<span class="week-status submitted">✓ 제출 완료</span>`;
     const txt = assignment.proof_text?.slice(0, 90) || '(인증 글 없음)';
@@ -515,15 +520,15 @@ function renderWeekCard(meta, assignment, status) {
       <span class="img-count">📎 첨부 ${imgs}장</span>
       ${netWorth != null ? `<span class="sep">순자산 ${netWorth.toLocaleString()}만원</span>` : ''}
     </div>`;
-    actions = `<a class="btn btn-success btn-sm" href="./submit.html?week=${meta.n}">수정</a>`;
+    actions = `${tplBtn}<a class="btn btn-success btn-sm" href="./submit.html?week=${meta.n}">수정</a>`;
   } else if (status === 'draft') {
     statusBadge = `<span class="week-status draft">📝 임시 저장</span>`;
     const txt = assignment.proof_text?.slice(0, 90) || '(아직 작성 중)';
     preview = `<div class="week-preview">${escapeHtml(txt)}${assignment.proof_text?.length > 90 ? '…' : ''}</div>`;
-    actions = `<a class="btn btn-primary" href="./submit.html?week=${meta.n}">이어 작성</a>`;
+    actions = `${tplBtn}<a class="btn btn-primary" href="./submit.html?week=${meta.n}">이어 작성</a>`;
   } else if (status === 'pending') {
     statusBadge = `<span class="week-status pending">⏰ 미작성</span>`;
-    actions = `<a class="btn btn-primary" href="./submit.html?week=${meta.n}">작성하기</a>`;
+    actions = `${tplBtn}<a class="btn btn-primary" href="./submit.html?week=${meta.n}">작성하기</a>`;
   } else {
     // locked
     statusBadge = `<span class="week-status locked">🔒 미공개</span>`;
