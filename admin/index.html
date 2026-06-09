@@ -776,7 +776,7 @@ function renderTable() {
         </td>
         <td>${statusBadgeHtml(s.status)}</td>
         <td><span class="last-active">${relativeTime(s.last_login_at)}</span></td>
-        <td><a class="btn-detail" href="./student.html?id=${encodeURIComponent(s.id)}">상세</a></td>
+        <td><a class="btn-detail" href="/admin/student.html?id=${encodeURIComponent(s.id)}">상세</a></td>
       </tr>
     `;
   }).join('');
