@@ -521,6 +521,36 @@ main { padding: 28px 0 80px; }
   align-items: center;
   justify-content: center;
   font-size: 12px;
+  z-index: 2;
+}
+/* 파일(엑셀·문서) 카드 */
+.upload-preview .preview-card.file-card {
+  background: linear-gradient(180deg, #FAFCF7 0%, #F0FAE9 100%);
+  border-color: rgba(126, 217, 87, 0.32);
+}
+.upload-preview .preview-card.file-card .file-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  padding: 14px 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.upload-preview .preview-card.file-card .file-icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+.upload-preview .preview-card.file-card .file-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  word-break: break-all;
+  line-height: 1.4;
+  max-height: 4em;
+  overflow: hidden;
+  color: var(--text-secondary);
 }
 
 /* ===== Actions ===== */
@@ -878,9 +908,9 @@ main { padding: 28px 0 80px; }
 
       <label class="upload-area" for="image-upload">
         <div class="em">📎</div>
-        <div class="ttl">이미지 첨부 (선택)</div>
-        <div class="desc">캡처·손글씨 사진 등 — 최대 5장, 1장당 5MB 이하</div>
-        <input type="file" id="image-upload" multiple accept="image/*">
+        <div class="ttl">이미지 · 엑셀 파일 첨부 (선택)</div>
+        <div class="desc">캡처·손글씨 사진 · 작성한 엑셀 양식 — 최대 5개, 1개당 10MB 이하</div>
+        <input type="file" id="image-upload" multiple accept="image/*,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
       </label>
       <div class="upload-preview" id="upload-preview"></div>
     </section>
@@ -1027,7 +1057,23 @@ proof.addEventListener('input', updateCharCount);
 const upload = document.getElementById('image-upload');
 const previewEl = document.getElementById('upload-preview');
 
-function addPreviewCard({ src, file = null, dbId = null }) {
+function isImageType(fileOrPath) {
+  if (fileOrPath && typeof fileOrPath === 'object' && fileOrPath.type) {
+    return fileOrPath.type.startsWith('image/');
+  }
+  const s = String(fileOrPath || '').toLowerCase();
+  return /\.(png|jpe?g|gif|webp|bmp|heic|svg)$/.test(s);
+}
+
+function fileIconFor(name) {
+  const s = String(name || '').toLowerCase();
+  if (/\.(xlsx|xls)$/.test(s)) return '📊';
+  if (/\.(pdf)$/.test(s)) return '📕';
+  if (/\.(docx?|hwp)$/.test(s)) return '📝';
+  return '📎';
+}
+
+function addPreviewCard({ src, file = null, dbId = null, fileName = null, isImage = null }) {
   const card = document.createElement('div');
   card.className = 'preview-card';
   if (dbId) card.dataset.imageId = dbId;
@@ -1035,17 +1081,34 @@ function addPreviewCard({ src, file = null, dbId = null }) {
     card._file = file;
     pendingFiles.push({ card, file });
   }
-  card.innerHTML = `
-    <img src="${src}" alt="첨부 이미지">
-    <button type="button" class="remove" aria-label="삭제">×</button>
-  `;
+
+  const name = fileName || (file ? file.name : '첨부 파일');
+  const img = isImage !== null ? isImage : (file ? isImageType(file) : isImageType(name));
+
+  if (img) {
+    card.innerHTML = `
+      <img src="${src}" alt="${escapeHtmlAttr(name)}">
+      <button type="button" class="remove" aria-label="삭제">×</button>
+    `;
+  } else {
+    // 비이미지 파일 (엑셀·문서 등)
+    card.classList.add('file-card');
+    const icon = fileIconFor(name);
+    card.innerHTML = `
+      <a class="file-link" ${src ? `href="${src}" download="${escapeHtmlAttr(name)}"` : ''} target="_blank" rel="noopener" title="${escapeHtmlAttr(name)}">
+        <div class="file-icon">${icon}</div>
+        <div class="file-name">${escapeHtmlAttr(name)}</div>
+      </a>
+      <button type="button" class="remove" aria-label="삭제">×</button>
+    `;
+  }
+
   card.querySelector('.remove').addEventListener('click', async () => {
     if (dbId) {
       try {
         await fetch('/api/assignment-images?id=' + encodeURIComponent(dbId), { method: 'DELETE' });
       } catch {}
     }
-    // pendingFiles에서도 제거
     const idx = pendingFiles.findIndex(p => p.card === card);
     if (idx >= 0) pendingFiles.splice(idx, 1);
     card.remove();
@@ -1053,12 +1116,21 @@ function addPreviewCard({ src, file = null, dbId = null }) {
   previewEl.appendChild(card);
 }
 
+function escapeHtmlAttr(s) {
+  return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+}
+
 upload.addEventListener('change', (e) => {
   const files = Array.from(e.target.files).slice(0, 5);
   files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (ev) => addPreviewCard({ src: ev.target.result, file });
-    reader.readAsDataURL(file);
+    if (isImageType(file)) {
+      const reader = new FileReader();
+      reader.onload = (ev) => addPreviewCard({ src: ev.target.result, file });
+      reader.readAsDataURL(file);
+    } else {
+      // 엑셀·문서 등 — 로컬 미리보기는 파일명만 표시
+      addPreviewCard({ src: null, file, fileName: file.name, isImage: false });
+    }
   });
   e.target.value = ''; // 동일 파일 재선택 허용
 });
@@ -1118,10 +1190,19 @@ function fillForm(a) {
 
   proof.value = a.proof_text || '';
 
-  // 기존 이미지
+  // 기존 첨부 (이미지 + 파일)
   if (a.assignment_images?.length) {
     a.assignment_images.forEach(img => {
-      if (img.url) addPreviewCard({ src: img.url, dbId: img.id });
+      if (!img.url) return;
+      const path = img.storage_path || '';
+      const name = path.split('/').pop() || '첨부 파일';
+      const isImg = isImageType(path);
+      addPreviewCard({
+        src: img.url,
+        dbId: img.id,
+        fileName: name,
+        isImage: isImg,
+      });
     });
   }
 

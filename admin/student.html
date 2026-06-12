@@ -498,6 +498,30 @@ main { padding: 28px 0 80px; }
   text-align: center;
   padding: 10px;
 }
+.proof-file {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #FAFCF7 0%, #F0FAE9 100%);
+  border: 1px solid rgba(126, 217, 87, 0.32);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 14px 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.proof-file:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.proof-file .file-icon { font-size: 30px; margin-bottom: 6px; }
+.proof-file .file-name {
+  font-size: 11px; font-weight: 700; text-align: center;
+  word-break: break-all; line-height: 1.4;
+  max-height: 4em; overflow: hidden;
+  color: var(--text-secondary);
+}
+.proof-file .file-hint {
+  font-size: 10px; color: var(--color-secondary-dark);
+  font-weight: 700; margin-top: 4px;
+}
 
 /* ===== Empty / Locked states ===== */
 .empty-state {
@@ -831,16 +855,38 @@ function renderRoadmap(fd) {
     </table>`;
 }
 
+function isImageFile(path) {
+  return /\.(png|jpe?g|gif|webp|bmp|heic|svg)$/i.test(String(path || ''));
+}
+function fileIcon(name) {
+  const s = String(name || '').toLowerCase();
+  if (/\.(xlsx|xls)$/.test(s)) return '📊';
+  if (/\.(pdf)$/.test(s)) return '📕';
+  if (/\.(docx?|hwp)$/.test(s)) return '📝';
+  return '📎';
+}
+
 function renderProof(a) {
   if (!a.proof_text && !a.assignment_images?.length) return '';
   return `
     ${a.proof_text ? `<h4 class="subsection-title">💬 인증 글</h4><div class="proof-text">${escapeHtml(a.proof_text)}</div>` : ''}
     ${a.assignment_images?.length ? `
+      <h4 class="subsection-title">📎 첨부 자료</h4>
       <div class="proof-gallery">
-        ${a.assignment_images.map(img => img.url
-          ? `<a href="${escapeHtml(img.url)}" target="_blank" rel="noopener"><div class="proof-img" style="background-image:url('${escapeHtml(img.url)}');background-size:cover;background-position:center;"></div></a>`
-          : `<div class="proof-img">📎 이미지</div>`
-        ).join('')}
+        ${a.assignment_images.map(img => {
+          if (!img.url) return `<div class="proof-img">📎 미리보기 없음</div>`;
+          const path = img.storage_path || '';
+          const name = path.split('/').pop() || '첨부 파일';
+          if (isImageFile(path)) {
+            return `<a href="${escapeHtml(img.url)}" target="_blank" rel="noopener" title="${escapeHtml(name)}"><div class="proof-img" style="background-image:url('${escapeHtml(img.url)}');background-size:cover;background-position:center;"></div></a>`;
+          } else {
+            return `<a class="proof-file" href="${escapeHtml(img.url)}" download="${escapeHtml(name)}" target="_blank" rel="noopener" title="${escapeHtml(name)}">
+              <div class="file-icon">${fileIcon(name)}</div>
+              <div class="file-name">${escapeHtml(name.length > 24 ? name.slice(0, 22) + '…' : name)}</div>
+              <div class="file-hint">⬇ 다운로드</div>
+            </a>`;
+          }
+        }).join('')}
       </div>` : ''}`;
 }
 
