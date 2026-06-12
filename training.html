@@ -378,7 +378,7 @@ body.is-admin .status-icon { display: none; }
         <div class="stat-value"><span id="stat-total">0</span><small>명</small></div>
       </div>
       <div class="stat-card done">
-        <div class="stat-label">완료</div>
+        <div class="stat-label">진행 중</div>
         <div class="stat-value"><span id="stat-completed">0</span></div>
       </div>
       <div class="stat-card scheduled">
@@ -401,7 +401,7 @@ body.is-admin .status-icon { display: none; }
       </div>
       <div class="filter-chips" id="filter-chips">
         <button class="chip active" data-filter="all">전체 <span class="count" id="cnt-all">0</span></button>
-        <button class="chip" data-filter="completed">⭕ 완료 <span class="count" id="cnt-completed">0</span></button>
+        <button class="chip" data-filter="completed">⭕ 진행 중 <span class="count" id="cnt-completed">0</span></button>
         <button class="chip" data-filter="scheduled">🔺 예정 <span class="count" id="cnt-scheduled">0</span></button>
         <button class="chip" data-filter="pending">❌ 미정 <span class="count" id="cnt-pending">0</span></button>
       </div>
@@ -428,7 +428,7 @@ body.is-admin .status-icon { display: none; }
       <div class="text">
         <b>상태 안내</b>
         <div class="legend">
-          <span>⭕ <b>완료</b> — 트레이닝 진행 완료</span>
+          <span>⭕ <b>진행 중</b> — 트레이닝 진행 중</span>
           <span>🔺 <b>예정</b> — 일정 확정 / 진행 중</span>
           <span>❌ <b>미정</b> — 아직 일정 안 잡힘</span>
         </div>
@@ -479,7 +479,7 @@ function renderRow(s) {
     <div class="status-toggle" data-student-id="${escapeHtml(s.id)}">
       <button type="button" class="pending ${status === 'pending' ? 'on' : ''}" data-status="pending" title="미정">❌</button>
       <button type="button" class="scheduled ${status === 'scheduled' ? 'on' : ''}" data-status="scheduled" title="예정">🔺</button>
-      <button type="button" class="completed ${status === 'completed' ? 'on' : ''}" data-status="completed" title="완료">⭕</button>
+      <button type="button" class="completed ${status === 'completed' ? 'on' : ''}" data-status="completed" title="진행 중">⭕</button>
     </div>
   `;
 
