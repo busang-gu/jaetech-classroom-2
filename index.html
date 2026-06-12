@@ -252,6 +252,114 @@ header.site .wrap {
   line-height: 1.4;
 }
 
+/* ===== Training Highlight Card ===== */
+.training-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: linear-gradient(135deg, #F0FAE9 0%, #FFFCE5 100%);
+  border: 1px solid rgba(126, 217, 87, 0.32);
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 20px rgba(126, 217, 87, 0.18);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.training-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(126, 217, 87, 0.28);
+}
+.training-card::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(126, 217, 87, 0.24) 0%, transparent 70%);
+  pointer-events: none;
+}
+.training-card .left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-right: 22px;
+  margin-right: 22px;
+  border-right: 1px dashed rgba(90, 158, 63, 0.28);
+}
+.training-card .badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #5A9E3F;
+  color: #fff;
+  font-size: 10px; font-weight: 900;
+  padding: 3px 9px; border-radius: 999px;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.training-card .big-num {
+  font-size: 38px; font-weight: 900;
+  color: #5A9E3F;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.training-card .big-num small {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-left: 2px;
+}
+.training-card .num-label {
+  font-size: 11px; color: var(--text-secondary);
+  font-weight: 700; letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+.training-card .body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  position: relative; z-index: 1;
+}
+.training-card .ttl {
+  font-size: 18px; font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+.training-card .ttl .fire { color: #F59E0B; }
+.training-card .sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+.training-card .sub b { color: #5A9E3F; font-weight: 800; }
+.training-card .arrow-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 10px;
+  font-size: 12px; font-weight: 800;
+  color: #5A9E3F;
+}
+.training-card .arrow-row .arrow {
+  transition: transform 0.2s ease;
+}
+.training-card:hover .arrow-row .arrow {
+  transform: translateX(4px);
+}
+@media (max-width: 600px) {
+  .training-card { flex-direction: column; padding: 20px; }
+  .training-card .left {
+    border-right: 0;
+    border-bottom: 1px dashed rgba(90, 158, 63, 0.28);
+    padding-right: 0; margin-right: 0;
+    padding-bottom: 14px; margin-bottom: 14px;
+    flex-direction: row; gap: 14px;
+  }
+  .training-card .big-num { font-size: 30px; }
+}
+
 /* ===== Week Cards ===== */
 .week-cards { display: grid; gap: 18px; }
 .week-card {
@@ -686,6 +794,26 @@ document.addEventListener('auth-ready', function(e) {
     const a = document.getElementById('nav-admin');
     if (a) a.style.display = '';
   }
+
+  // 트레이닝 현황 — 진행 중 인원 표시
+  fetch('/api/training', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d || !d.summary) return;
+      const active = d.summary.completed || 0;          // ⭕ 진행 중
+      const reserved = d.summary.scheduled || 0;        // 🔺 예정
+      const el = document.getElementById('training-active');
+      if (el) el.textContent = active;
+      // 동기 부여 카피 — 진행 중 + 예정 합산 N명
+      const total = active + reserved;
+      const subEl = document.querySelector('#training-card-link .sub');
+      if (subEl && total > 0) {
+        subEl.innerHTML = `강의 듣고 끝이 아니에요. 내 상황에 맞게 자산 구조를 같이 잡아주는 시간 — <b>이미 ${total}명이 받기 시작했어요.</b> 내 차례는?`;
+      } else if (subEl) {
+        subEl.innerHTML = `강의 듣고 끝이 아니에요. 내 상황에 맞게 자산 구조를 같이 잡아주는 시간 — <b>먼저 신청한 사람이 먼저 받아요.</b>`;
+      }
+    })
+    .catch(() => {});
 });
 </script>
 
@@ -717,6 +845,22 @@ document.addEventListener('auth-ready', function(e) {
 <!-- ===== Quick Links ===== -->
 <section class="bg-base" style="padding-top: clamp(36px, 5vw, 56px); padding-bottom: clamp(36px, 5vw, 56px);">
   <div class="wrap">
+    <!-- 트레이닝 현황표 강조 카드 -->
+    <a class="training-card reveal" href="./training.html" id="training-card-link">
+      <div class="left">
+        <span class="badge">🎯 트레이닝</span>
+        <div class="big-num"><span id="training-active">—</span><small>명</small></div>
+        <div class="num-label">진행 중</div>
+      </div>
+      <div class="body">
+        <h3 class="ttl"><span class="fire">🔥</span> 나도 트레이닝 받자!</h3>
+        <p class="sub">강의 듣고 끝이 아니에요. 내 상황에 맞게 자산 구조를 같이 잡아주는 시간 — <b>이미 친구들 받기 시작했어요.</b></p>
+        <div class="arrow-row">
+          현황표 보러 가기 <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+
     <div class="quick-links">
       <a class="quick-link reveal" href="./assignments.html">
         <span class="icon">📝</span>
