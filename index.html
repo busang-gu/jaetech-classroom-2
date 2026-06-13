@@ -300,22 +300,32 @@ header.site .wrap {
   letter-spacing: 0.06em;
   margin-bottom: 8px;
 }
-.training-card .big-num {
-  font-size: 38px; font-weight: 900;
-  color: #5A9E3F;
-  line-height: 1;
-  letter-spacing: -0.03em;
+.training-card .stat-row {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
 }
-.training-card .big-num small {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 700;
-  margin-left: 2px;
+.training-card .stat-mini {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  min-width: 64px;
 }
-.training-card .num-label {
-  font-size: 11px; color: var(--text-secondary);
-  font-weight: 700; letter-spacing: 0.02em;
-  margin-top: 4px;
+.training-card .stat-mini .ico { font-size: 18px; line-height: 1; margin-bottom: 2px; }
+.training-card .stat-mini .num {
+  font-size: 28px; font-weight: 900;
+  line-height: 1; letter-spacing: -0.02em;
+}
+.training-card .stat-mini.active .num { color: #5A9E3F; }
+.training-card .stat-mini.scheduled .num { color: #D97706; }
+.training-card .stat-mini .num small {
+  font-size: 12px; color: var(--text-secondary);
+  font-weight: 700; margin-left: 2px;
+}
+.training-card .stat-mini .lbl {
+  font-size: 10px; color: var(--text-secondary);
+  font-weight: 700; letter-spacing: 0.04em;
+  margin-top: 3px;
 }
 .training-card .body {
   flex: 1; min-width: 0;
@@ -355,9 +365,9 @@ header.site .wrap {
     border-bottom: 1px dashed rgba(90, 158, 63, 0.28);
     padding-right: 0; margin-right: 0;
     padding-bottom: 14px; margin-bottom: 14px;
-    flex-direction: row; gap: 14px;
+    align-items: flex-start;
   }
-  .training-card .big-num { font-size: 30px; }
+  .training-card .stat-mini .num { font-size: 24px; }
 }
 
 /* ===== Week Cards ===== */
@@ -795,16 +805,18 @@ document.addEventListener('auth-ready', function(e) {
     if (a) a.style.display = '';
   }
 
-  // 트레이닝 현황 — 진행 중 인원 표시
+  // 트레이닝 현황 — 진행 중 + 예정 인원 표시
   fetch('/api/training', { cache: 'no-store' })
     .then(r => r.ok ? r.json() : null)
     .then(d => {
       if (!d || !d.summary) return;
       const active = d.summary.completed || 0;          // ⭕ 진행 중
       const reserved = d.summary.scheduled || 0;        // 🔺 예정
-      const el = document.getElementById('training-active');
-      if (el) el.textContent = active;
-      // 동기 부여 카피 — 진행 중 + 예정 합산 N명
+      const elA = document.getElementById('training-active');
+      const elS = document.getElementById('training-scheduled');
+      if (elA) elA.textContent = active;
+      if (elS) elS.textContent = reserved;
+
       const total = active + reserved;
       const subEl = document.querySelector('#training-card-link .sub');
       if (subEl && total > 0) {
@@ -849,8 +861,18 @@ document.addEventListener('auth-ready', function(e) {
     <a class="training-card reveal" href="./training.html" id="training-card-link">
       <div class="left">
         <span class="badge">🎯 트레이닝</span>
-        <div class="big-num"><span id="training-active">—</span><small>명</small></div>
-        <div class="num-label">진행 중</div>
+        <div class="stat-row">
+          <div class="stat-mini active">
+            <div class="ico">⭕</div>
+            <div class="num"><span id="training-active">—</span><small>명</small></div>
+            <div class="lbl">진행 중</div>
+          </div>
+          <div class="stat-mini scheduled">
+            <div class="ico">🔺</div>
+            <div class="num"><span id="training-scheduled">—</span><small>명</small></div>
+            <div class="lbl">예정</div>
+          </div>
+        </div>
       </div>
       <div class="body">
         <h3 class="ttl"><span class="fire">🔥</span> 나도 트레이닝 받자!</h3>
