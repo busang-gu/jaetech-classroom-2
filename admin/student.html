@@ -821,6 +821,7 @@ function renderAssetTable(fd) {
     </div>`;
   const asset = fd.asset || [], debt = fd.debt || [], income = fd.income || [], expense = fd.expense || [];
   const sA = sumArr(asset), sD = sumArr(debt), sI = sumArr(income), sE = sumArr(expense);
+  if (!sA && !sD && !sI && !sE) return '';
   return `
     <h4 class="subsection-title">📊 자산 현황표</h4>
     <div class="assets-grid">
@@ -853,6 +854,66 @@ function renderRoadmap(fd) {
           </tr>`).join('')}
       </tbody>
     </table>`;
+}
+
+const WEEK3_TERMS = {
+  term1: '호가 vs 실거래가', term2: '전용면적 vs 공급면적', term3: '용적률·건폐율',
+  term4: '취득세', term5: '재산세 6월 1일 룰', term6: '양도세',
+  term7: 'LTV', term8: 'DSR · DTI', term9: '원리금균등 vs 원금균등',
+  term10: '부대비용 5종', term11: '9억 기준 부대비용 ≈ 3,600만원',
+  term12: '토지 vs 건물', term13: '5대 핵심 업무지구', term14: '주요 노선', term15: '전세 = 매매 지지선',
+};
+
+function renderWeek3(fd) {
+  const r = fd.reasons || {};
+  const c = fd.conditions || {};
+  const checks = fd.checks || {};
+  const hasReasons = r.r1 || r.r2 || r.r3 || r.favoriteLine;
+  const hasChecks = Object.keys(checks).length > 0;
+  const hasConditions = c.budgetOwn || c.budgetLoan || c.region || (c.lines && c.lines.length) || c.size || c.age || c.school || c.movein;
+  if (!hasReasons && !hasChecks && !hasConditions) return '';
+
+  let html = '';
+
+  if (hasReasons) {
+    const list = [r.r1, r.r2, r.r3].filter(Boolean);
+    html += `<h4 class="subsection-title">🏠 내가 집을 사야 하는 이유</h4>
+      <ol style="margin:0 0 14px; padding-left:22px; line-height:1.7; color:#1a3d0e;">
+        ${list.map(t => `<li style="margin-bottom:6px;">${escapeHtml(t)}</li>`).join('')}
+      </ol>
+      ${r.favoriteLine ? `<div style="background:#f0fae9; border-left:3px solid #7ED957; padding:10px 14px; border-radius:6px; margin-bottom:14px; font-size:13.5px; color:#1a3d0e;"><b style="color:#5A9E3F;">💡 마음에 박힌 한 줄</b><br>${escapeHtml(r.favoriteLine)}</div>` : ''}`;
+  }
+
+  if (hasChecks) {
+    const total = Object.keys(WEEK3_TERMS).length;
+    const checked = Object.entries(checks).filter(([k, v]) => v).length;
+    html += `<h4 class="subsection-title">📚 핵심 용어 자가 체크 <span style="color:#5A9E3F; font-weight:800;">${checked}/${total}</span></h4>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px 12px; margin-bottom:14px;">
+        ${Object.entries(WEEK3_TERMS).map(([k, label]) => `
+          <div style="font-size:12.5px; color:${checks[k] ? '#1a3d0e' : '#94a3b8'}; ${checks[k] ? 'font-weight:700;' : ''}">
+            ${checks[k] ? '✓' : '○'} ${escapeHtml(label)}
+          </div>`).join('')}
+      </div>`;
+  }
+
+  if (hasConditions) {
+    const own = parseFloat(c.budgetOwn) || 0;
+    const loan = parseFloat(c.budgetLoan) || 0;
+    const max = (own + loan) > 0 ? Math.round((own + loan) / 1.04) : 0;
+    const lines = (c.lines || []).join(' · ');
+    html += `<h4 class="subsection-title">🎯 내가 사고 싶은 집의 조건</h4>
+      <div style="background:#FAFCF7; border:1px solid rgba(126,217,87,0.32); border-radius:10px; padding:14px 16px; font-size:13px; line-height:1.9;">
+        ${(own || loan) ? `<div><b>💸 예산</b> · 자기자본 ${own.toLocaleString()}만 + 대출 ${loan.toLocaleString()}만 → 살 수 있는 집 <b style="color:#5A9E3F;">${max.toLocaleString()}만원</b></div>` : ''}
+        ${c.region ? `<div><b>📍 관심 지역</b> · ${escapeHtml(c.region)}</div>` : ''}
+        ${lines ? `<div><b>🚇 관심 노선</b> · ${escapeHtml(lines)}</div>` : ''}
+        ${c.size ? `<div><b>📐 평수</b> · ${escapeHtml(c.size)}</div>` : ''}
+        ${c.age ? `<div><b>🏗 연식</b> · ${escapeHtml(c.age)}</div>` : ''}
+        ${c.school ? `<div><b>📚 학군</b> · ${escapeHtml(c.school)}</div>` : ''}
+        ${c.movein ? `<div><b>📅 입주 시점</b> · ${escapeHtml(c.movein)}</div>` : ''}
+      </div>`;
+  }
+
+  return html;
 }
 
 function isImageFile(path) {
@@ -910,7 +971,7 @@ function renderWeekCard(meta, a) {
       statusBadge = '<span class="week-status draft">📝 임시 저장</span>';
       timestamp = a.updated_at ? `<span class="submitted-time">${fmtDateTime(a.updated_at)} 마지막 수정</span>` : '';
     }
-    body = `<div class="submission-body">${renderAssetTable(a.form_data || {})}${renderRoadmap(a.form_data || {})}${renderProof(a)}</div>`;
+    body = `<div class="submission-body">${renderAssetTable(a.form_data || {})}${renderRoadmap(a.form_data || {})}${renderWeek3(a.form_data || {})}${renderProof(a)}</div>`;
   }
 
   return `

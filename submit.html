@@ -620,6 +620,103 @@ main { padding: 28px 0 80px; }
   line-height: 1.7;
 }
 .tip-note b { font-weight: 800; }
+
+/* ===== Week3 — 자유 작성 영역 ===== */
+.week3-why-grid { display: grid; gap: 14px; }
+.week3-field { display: flex; flex-direction: column; gap: 6px; }
+.week3-label {
+  font-size: 13px; font-weight: 700; color: var(--color-secondary-dark);
+}
+.week3-label small { font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 4px; }
+.week3-textarea, .week3-input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid #d8e3d2;
+  border-radius: 10px; background: #fff; font-size: 14px;
+  font-family: inherit; color: #1a3d0e; line-height: 1.6;
+  transition: border-color .15s ease;
+}
+.week3-textarea { resize: vertical; min-height: 60px; }
+.week3-textarea:focus, .week3-input:focus { outline: none; border-color: #7ED957; }
+
+/* ===== Week3 — 자가 체크 ===== */
+.week3-check-grid { display: grid; gap: 16px; }
+@media (min-width: 720px) { .week3-check-grid { grid-template-columns: repeat(2, 1fr); } }
+.week3-check-group {
+  background: linear-gradient(180deg, #FAFCF7 0%, #F2FAEB 100%);
+  border: 1px solid rgba(126,217,87,0.32); border-radius: 12px; padding: 14px 16px;
+}
+.week3-group-title {
+  font-size: 12px; font-weight: 800; color: #5A9E3F;
+  letter-spacing: .04em; margin-bottom: 10px;
+}
+.week3-check-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 7px 0; font-size: 13.5px; line-height: 1.55;
+  color: #1a3d0e; cursor: pointer;
+}
+.week3-check-item input[type="checkbox"] {
+  margin-top: 3px; width: 16px; height: 16px; accent-color: #7ED957; flex-shrink: 0;
+}
+.week3-check-item span { flex: 1; }
+.week3-check-item input:checked + span { color: #5A9E3F; font-weight: 700; }
+
+.week3-progress-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 14px; padding: 12px 16px;
+  background: #f0fae9; border: 1px solid rgba(126,217,87,0.4); border-radius: 10px;
+}
+.week3-progress-label { font-size: 13px; font-weight: 700; color: #1a3d0e; }
+.week3-progress-num { font-size: 16px; font-weight: 900; color: #5A9E3F; }
+.week3-progress-num #week3-check-count { font-size: 22px; }
+
+/* ===== Week3 — 조건표 ===== */
+.week3-cond-block { margin-bottom: 22px; }
+.week3-cond-block:last-child { margin-bottom: 0; }
+.week3-cond-title {
+  font-size: 14px; font-weight: 800; color: #1a3d0e;
+  margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid rgba(126,217,87,0.4);
+}
+.week3-cond-subtitle {
+  font-size: 12px; font-weight: 700; color: var(--color-secondary-dark);
+  margin: 12px 0 8px;
+}
+.week3-cond-grid-3 { display: grid; gap: 12px; }
+@media (min-width: 720px) { .week3-cond-grid-3 { grid-template-columns: repeat(3, 1fr); } }
+.week3-cond-field { display: flex; flex-direction: column; gap: 6px; }
+.week3-cond-field > span {
+  font-size: 12.5px; font-weight: 700; color: var(--color-secondary-dark);
+}
+.week3-cond-field > span small {
+  font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 3px;
+}
+.week3-cond-field input,
+.week3-cond-field select {
+  width: 100%; padding: 10px 12px; border: 1.5px solid #d8e3d2;
+  border-radius: 8px; background: #fff; font-size: 14px; color: #1a3d0e;
+  font-family: inherit;
+}
+.week3-cond-field input:focus,
+.week3-cond-field select:focus { outline: none; border-color: #7ED957; }
+.week3-readonly { background: #f5f8f3 !important; font-weight: 800 !important; color: #5A9E3F !important; }
+.week3-cond-hint {
+  margin: 6px 2px 0; font-size: 12px; color: #64748b;
+}
+
+.week3-line-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.week3-line-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px; background: #fff;
+  border: 1.5px solid #d8e3d2; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: #1a3d0e;
+  cursor: pointer; transition: all .15s ease;
+}
+.week3-line-chip input[type="checkbox"] {
+  width: 14px; height: 14px; accent-color: #7ED957; margin: 0;
+}
+.week3-line-chip:has(input:checked) {
+  background: #f0fae9; border-color: #7ED957; color: #5A9E3F;
+}
 </style>
 </head>
 <body>
@@ -896,6 +993,174 @@ main { padding: 28px 0 80px; }
       </table>
     </section>
 
+    <!-- ===== Section A: 내가 집을 사야 하는 이유 (3주차 전용) ===== -->
+    <section class="section-card" id="section-week3-why" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">1</span>
+        <h2 class="section-title">🏠 내가 집을 사야 하는 이유</h2>
+      </div>
+      <p class="section-desc">강의 내용을 내 상황·내 언어로 옮겨 적어주세요. 정답은 없어요. 마음에 흘러나오는 그대로 OK.</p>
+
+      <div class="week3-why-grid">
+        <label class="week3-field">
+          <span class="week3-label">① 이유 첫 번째</span>
+          <textarea class="week3-textarea" id="week3-reason-1" rows="2" placeholder="예) 임대인 갑질 보면서 자란 기억이 있어서, 내 집은 꼭 있어야겠다 싶었어요."></textarea>
+        </label>
+        <label class="week3-field">
+          <span class="week3-label">② 이유 두 번째</span>
+          <textarea class="week3-textarea" id="week3-reason-2" rows="2" placeholder="예) 월급은 그대로인데 집값만 도망가는 게 무서워서요."></textarea>
+        </label>
+        <label class="week3-field">
+          <span class="week3-label">③ 이유 세 번째 <small>(선택)</small></span>
+          <textarea class="week3-textarea" id="week3-reason-3" rows="2" placeholder="예) 결혼·아이 등 라이프 이벤트 전에 자리 잡고 싶어요."></textarea>
+        </label>
+        <label class="week3-field">
+          <span class="week3-label">💡 강의에서 가장 마음에 박힌 한 줄 <small>(선택)</small></span>
+          <input class="week3-input" type="text" id="week3-favorite-line" placeholder="예) 강아지(집값)는 결국 주인(통화량) 방향대로 간다.">
+        </label>
+      </div>
+    </section>
+
+    <!-- ===== Section B: 핵심 용어 자가 체크 (3주차 전용) ===== -->
+    <section class="section-card" id="section-week3-checks" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">2</span>
+        <h2 class="section-title">📚 핵심 용어 자가 체크</h2>
+      </div>
+      <p class="section-desc">아는 것만 ✓ 체크하세요. 체크 안 한 항목은 해당 구간을 다시 듣고 채워주세요. 정답 맞히기가 아니라 <b>모르는 걸 발견하기</b>가 목적이에요.</p>
+
+      <div class="week3-check-grid">
+        <div class="week3-check-group">
+          <div class="week3-group-title">🏘 거래·면적</div>
+          <label class="week3-check-item"><input type="checkbox" data-check="term1"><span>호가 vs 실거래가의 차이</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term2"><span>전용면적 vs 공급면적</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term3"><span>용적률·건폐율 (낮을수록 사업성 ↑)</span></label>
+        </div>
+
+        <div class="week3-check-group">
+          <div class="week3-group-title">💰 세금</div>
+          <label class="week3-check-item"><input type="checkbox" data-check="term4"><span>취득세 (집 살 때)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term5"><span>재산세 — 6월 1일 룰 (살 땐 그 뒤, 팔 땐 그 전)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term6"><span>양도세 (시세차익 났을 때만)</span></label>
+        </div>
+
+        <div class="week3-check-group">
+          <div class="week3-group-title">🏦 대출</div>
+          <label class="week3-check-item"><input type="checkbox" data-check="term7"><span>LTV (집값 대비 대출 한도)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term8"><span>DSR (소득 대비 감당력) · DTI</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term9"><span>원리금균등 vs 원금균등 (보통 원리금균등)</span></label>
+        </div>
+
+        <div class="week3-check-group">
+          <div class="week3-group-title">📑 부대비용</div>
+          <label class="week3-check-item"><input type="checkbox" data-check="term10"><span>5종 (취득세·중개·법무·국민주택채권·인지세)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term11"><span>9억 기준 부대비용 약 3,600만원</span></label>
+        </div>
+
+        <div class="week3-check-group">
+          <div class="week3-group-title">📍 입지·전세</div>
+          <label class="week3-check-item"><input type="checkbox" data-check="term12"><span>토지 vs 건물 (30년 후 건물 가치 ≈ 0)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term13"><span>5대 핵심 업무지구 (도심·여의도·강남·마곡·판교)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term14"><span>주요 노선 (2·3·7·9·신분당·5호선)</span></label>
+          <label class="week3-check-item"><input type="checkbox" data-check="term15"><span>전세 = 실사용 가치 = 매매가 지지선</span></label>
+        </div>
+      </div>
+
+      <div class="week3-progress-row">
+        <span class="week3-progress-label">✓ 체크 완료</span>
+        <span class="week3-progress-num"><span id="week3-check-count">0</span> / 15</span>
+      </div>
+    </section>
+
+    <!-- ===== Section C: 내가 사고 싶은 집의 조건 (3주차 전용 → 4주차로 연결) ===== -->
+    <section class="section-card" id="section-week3-conditions" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">3</span>
+        <h2 class="section-title">🎯 내가 사고 싶은 집의 조건</h2>
+      </div>
+      <p class="section-desc">4주차에 프롭테크로 단지 찾을 때 그대로 쓸 거예요. 모르는 칸은 비워두고 가능한 부분만 채워주세요.</p>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">💸 예산</div>
+        <div class="week3-cond-grid-3">
+          <label class="week3-cond-field">
+            <span>① 내 자기자본 <small>(만원)</small></span>
+            <input type="number" min="0" placeholder="0" id="w3-budget-own">
+          </label>
+          <label class="week3-cond-field">
+            <span>② 받을 수 있는 대출 <small>(만원)</small></span>
+            <input type="number" min="0" placeholder="0" id="w3-budget-loan">
+          </label>
+          <label class="week3-cond-field">
+            <span>③ 살 수 있는 집 가격 <small>(부대비용 4% 차감)</small></span>
+            <input type="number" readonly placeholder="자동 계산" id="w3-budget-total" class="week3-readonly">
+          </label>
+        </div>
+        <p class="week3-cond-hint">※ ③ = (① + ②) ÷ 1.04. 정확한 건 네이버 부동산 계산기로 검증하세요.</p>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">🚇 지역 · 지하철 노선</div>
+        <label class="week3-cond-field">
+          <span>관심 지역 <small>(구·동 단위, 여러 개 OK)</small></span>
+          <input type="text" placeholder="예) 마포구·송파구·동탄·수지" id="w3-region">
+        </label>
+        <div class="week3-cond-subtitle">관심 노선 (복수 선택)</div>
+        <div class="week3-line-grid">
+          <label class="week3-line-chip"><input type="checkbox" data-line="2호선"><span>2호선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="3호선"><span>3호선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="5호선"><span>5호선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="7호선"><span>7호선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="9호선"><span>9호선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="신분당선"><span>신분당선</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="GTX-A"><span>GTX-A</span></label>
+          <label class="week3-line-chip"><input type="checkbox" data-line="기타"><span>기타·미정</span></label>
+        </div>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">🏠 평수 · 연식 · 학군</div>
+        <div class="week3-cond-grid-3">
+          <label class="week3-cond-field">
+            <span>희망 평수</span>
+            <select id="w3-size">
+              <option value="">선택 안 함</option>
+              <option value="20평대">20평대</option>
+              <option value="30평대">30평대</option>
+              <option value="40평대 이상">40평대 이상</option>
+            </select>
+          </label>
+          <label class="week3-cond-field">
+            <span>연식</span>
+            <select id="w3-age">
+              <option value="">선택 안 함</option>
+              <option value="신축 (5년 이내)">신축 (5년 이내)</option>
+              <option value="준신축 (5~10년)">준신축 (5~10년)</option>
+              <option value="구축 (10~20년)">구축 (10~20년)</option>
+              <option value="재건축 후보 (20년 이상)">재건축 후보 (20년 이상)</option>
+              <option value="상관 없음">상관 없음</option>
+            </select>
+          </label>
+          <label class="week3-cond-field">
+            <span>학군 필요?</span>
+            <select id="w3-school">
+              <option value="">선택 안 함</option>
+              <option value="꼭 필요">꼭 필요</option>
+              <option value="있으면 좋음">있으면 좋음</option>
+              <option value="상관 없음">상관 없음</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">📅 입주 희망 시점</div>
+        <label class="week3-cond-field">
+          <input type="text" placeholder="예) 2027년 봄 / 결혼 전 / 첫 아이 입학 전" id="w3-movein">
+        </label>
+      </div>
+    </section>
+
     <!-- ===== Section 3: 인증 글 ===== -->
     <section class="section-card">
       <div class="section-head">
@@ -934,7 +1199,7 @@ const WEEK_META = {
   1: {
     title: '🔹 내 자산 그릇 점검하기',
     sub: '강의를 시청한 후, 본인 숫자로 직접 채워보세요. 정확하지 않아도 OK — 일단 채우는 게 시작이에요.',
-    due: '6/7', template: '내집도은퇴도_1주차_과제양식.xlsx', form: true,
+    due: '6/7', template: '내집도은퇴도_1주차_과제양식.xlsx', form: 'week1',
   },
   2: {
     title: '🔹 평생 흔들리지 않는 자산 구조 — 은퇴 체력 만들기',
@@ -946,7 +1211,11 @@ const WEEK_META = {
       { emoji: '📈', name: '내 포트폴리오 2가지 설계', desc: '부동산용(단기·안전) + 나를 위한(장기·복리) 두 포트 설계' },
     ],
   },
-  3: { title: '🔹 내 집 마련 기초',          sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/21', template: null, form: false },
+  3: {
+    title: '🔹 내 집 마련 기초',
+    sub: '오늘 강의 3단(왜·어떻게·어떤)을 내 상황으로 옮겨 적어주세요. 4주차 단지 찾기에 그대로 쓸 거예요.',
+    due: '6/21', template: null, form: 'week3',
+  },
   4: { title: '🔹 나만의 똘똘한 1채 찾기',   sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/28', template: null, form: false },
 };
 const WEEK = parseInt(new URLSearchParams(location.search).get('week') || '1', 10) || 1;
@@ -969,14 +1238,20 @@ const META = WEEK_META[WEEK] || WEEK_META[1];
     else if (n === WEEK) el.classList.add('active');
   });
 
-  // 1주차 전용 폼 표시/숨김
-  const showForm = !!META.form;
-  document.getElementById('section-asset-table').style.display = showForm ? '' : 'none';
-  document.getElementById('section-roadmap').style.display = showForm ? '' : 'none';
+  // 주차별 폼 표시/숨김
+  const isWeek1 = META.form === 'week1';
+  const isWeek3 = META.form === 'week3';
+  document.getElementById('section-asset-table').style.display = isWeek1 ? '' : 'none';
+  document.getElementById('section-roadmap').style.display = isWeek1 ? '' : 'none';
+  document.getElementById('section-week3-why').style.display = isWeek3 ? '' : 'none';
+  document.getElementById('section-week3-checks').style.display = isWeek3 ? '' : 'none';
+  document.getElementById('section-week3-conditions').style.display = isWeek3 ? '' : 'none';
 
-  // 양식 다운로드 안내 (1주차 외 + template 있는 주차)
+  // 양식 다운로드 안내 (자체 폼 없고 + template 있는 주차)
+  const hasOwnForm = isWeek1 || isWeek3;
+  const showForm = hasOwnForm; // 호환용 (아래 로직에서 사용)
   const notice = document.getElementById('section-template-notice');
-  if (!showForm && META.template) {
+  if (!hasOwnForm && META.template) {
     notice.style.display = '';
     const btn = document.getElementById('template-download-btn');
     btn.href = './assignments/' + encodeURIComponent(META.template);
@@ -1044,6 +1319,29 @@ function recalc() {
 }
 document.querySelectorAll('input[data-group]').forEach(input => {
   input.addEventListener('input', recalc);
+});
+
+// ===== Week3 — 체크 카운터 =====
+function updateWeek3CheckCount() {
+  const checked = document.querySelectorAll('input[data-check]:checked').length;
+  const el = document.getElementById('week3-check-count');
+  if (el) el.textContent = checked;
+}
+document.querySelectorAll('input[data-check]').forEach(cb => {
+  cb.addEventListener('change', updateWeek3CheckCount);
+});
+
+// ===== Week3 — 예산 자동 계산 (집값 = (자기자본 + 대출) ÷ 1.04) =====
+function recalcWeek3Budget() {
+  const own = parseFloat(document.getElementById('w3-budget-own')?.value) || 0;
+  const loan = parseFloat(document.getElementById('w3-budget-loan')?.value) || 0;
+  const total = own + loan;
+  const max = total > 0 ? Math.round(total / 1.04) : 0;
+  const el = document.getElementById('w3-budget-total');
+  if (el) el.value = max > 0 ? max : '';
+}
+['w3-budget-own', 'w3-budget-loan'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', recalcWeek3Budget);
 });
 
 // ===== 글자 수 카운터 =====
@@ -1137,7 +1435,7 @@ upload.addEventListener('change', (e) => {
 });
 
 // ===== 폼 직렬화 / 복원 =====
-function collectFormData() {
+function collectWeek1Data() {
   const sumByGroup = (group) => Array.from(
     document.querySelectorAll(`input[data-group="${group}"]`)
   ).map(i => parseFloat(i.value) || 0);
@@ -1165,8 +1463,42 @@ function collectFormData() {
   };
 }
 
-function fillForm(a) {
-  const fd = a.form_data || {};
+function collectWeek3Data() {
+  const val = (id) => document.getElementById(id)?.value || '';
+  const checks = {};
+  document.querySelectorAll('input[data-check]').forEach(cb => {
+    checks[cb.dataset.check] = cb.checked;
+  });
+  const lines = Array.from(document.querySelectorAll('input[data-line]:checked'))
+    .map(cb => cb.dataset.line);
+  return {
+    reasons: {
+      r1: val('week3-reason-1'),
+      r2: val('week3-reason-2'),
+      r3: val('week3-reason-3'),
+      favoriteLine: val('week3-favorite-line'),
+    },
+    checks,
+    conditions: {
+      budgetOwn: val('w3-budget-own'),
+      budgetLoan: val('w3-budget-loan'),
+      region: val('w3-region'),
+      lines,
+      size: val('w3-size'),
+      age: val('w3-age'),
+      school: val('w3-school'),
+      movein: val('w3-movein'),
+    },
+  };
+}
+
+function collectFormData() {
+  if (META.form === 'week1') return collectWeek1Data();
+  if (META.form === 'week3') return collectWeek3Data();
+  return {};
+}
+
+function fillWeek1(fd) {
   const fillGroup = (group, values) => {
     const inputs = document.querySelectorAll(`input[data-group="${group}"]`);
     (values || []).forEach((v, i) => {
@@ -1188,6 +1520,41 @@ function fillForm(a) {
     if (inputs[2]) inputs[2].value = row.home_goal || '';
     if (inputs[3]) inputs[3].value = row.retire_goal || '';
   });
+}
+
+function fillWeek3(fd) {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  const r = fd.reasons || {};
+  set('week3-reason-1', r.r1);
+  set('week3-reason-2', r.r2);
+  set('week3-reason-3', r.r3);
+  set('week3-favorite-line', r.favoriteLine);
+
+  const checks = fd.checks || {};
+  document.querySelectorAll('input[data-check]').forEach(cb => {
+    cb.checked = !!checks[cb.dataset.check];
+  });
+  updateWeek3CheckCount();
+
+  const c = fd.conditions || {};
+  set('w3-budget-own', c.budgetOwn);
+  set('w3-budget-loan', c.budgetLoan);
+  set('w3-region', c.region);
+  set('w3-size', c.size);
+  set('w3-age', c.age);
+  set('w3-school', c.school);
+  set('w3-movein', c.movein);
+  const linesSet = new Set(c.lines || []);
+  document.querySelectorAll('input[data-line]').forEach(cb => {
+    cb.checked = linesSet.has(cb.dataset.line);
+  });
+  recalcWeek3Budget();
+}
+
+function fillForm(a) {
+  const fd = a.form_data || {};
+  if (META.form === 'week1') fillWeek1(fd);
+  if (META.form === 'week3') fillWeek3(fd);
 
   proof.value = a.proof_text || '';
 
