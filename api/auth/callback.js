@@ -89,6 +89,12 @@ export default async function handler(req, res) {
       return res.redirect(302, '/login.html?err=db_error');
     }
 
+    // 3-1) 강퇴 사용자 차단 — 쿠키 발급 없이 안내 페이지로
+    if (user.is_banned) {
+      const r = user.banned_reason ? '?reason=' + encodeURIComponent(user.banned_reason) : '';
+      return res.redirect(302, '/banned.html' + r);
+    }
+
     // 4) JWT 발급 (userId 포함)
     const secret = new TextEncoder().encode(jwtSecret);
     const token = await new SignJWT({

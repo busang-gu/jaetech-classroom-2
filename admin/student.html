@@ -15,6 +15,11 @@
     const r = await fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' });
     if (!r.ok) throw new Error('unauth');
     const user = await r.json();
+    if (user.banned) {
+      const q = user.reason ? '?reason=' + encodeURIComponent(user.reason) : '';
+      location.replace('/banned.html' + q);
+      return;
+    }
     if (!user.isAdmin) {
       location.replace('/');
       return;
@@ -212,6 +217,67 @@ button { font-family: inherit; cursor: pointer; }
   border: 1px solid var(--color-urgent);
 }
 .btn-danger:hover { background: var(--color-urgent-soft); }
+.btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* ===== 강퇴 배지 + 알림 박스 ===== */
+.banned-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; background: #FEF2F2; color: #B91C1C;
+  border: 1px solid #FCA5A5; border-radius: 999px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  margin-left: 8px;
+}
+.banned-banner {
+  background: linear-gradient(180deg, #FEF2F2 0%, #FECACA 100%);
+  border: 1.5px solid #F87171; border-radius: 12px;
+  padding: 14px 18px; margin: 12px 0 0;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.banned-banner .icn { font-size: 22px; line-height: 1; flex-shrink: 0; }
+.banned-banner .body { flex: 1; font-size: 13px; line-height: 1.6; color: #7F1D1D; }
+.banned-banner .body b { font-weight: 800; }
+.banned-banner .body .reason {
+  margin-top: 6px; padding: 8px 12px; background: rgba(255,255,255,0.7);
+  border-radius: 8px; font-size: 12.5px; color: #991B1B;
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* ===== 강퇴 모달 ===== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+.modal-card {
+  width: 100%; max-width: 440px;
+  background: var(--surface-base); border-radius: 16px;
+  padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+.modal-card h3 {
+  margin: 0 0 8px; font-size: 18px; font-weight: 800;
+  color: var(--color-urgent);
+}
+.modal-card .modal-desc {
+  font-size: 13px; line-height: 1.6; color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+.modal-card label {
+  display: block; font-size: 12px; font-weight: 700;
+  color: var(--text-primary); margin-bottom: 6px;
+}
+.modal-card textarea {
+  width: 100%; min-height: 80px; padding: 10px 12px;
+  border: 1.5px solid var(--border-soft); border-radius: 10px;
+  font-family: inherit; font-size: 13.5px; line-height: 1.5;
+  color: var(--text-primary); resize: vertical;
+  box-sizing: border-box;
+}
+.modal-card textarea:focus { outline: none; border-color: var(--color-urgent); }
+.modal-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  margin-top: 18px;
+}
 
 /* ===== Quick Stats ===== */
 .quick-stats {
@@ -655,7 +721,8 @@ main { padding: 28px 0 80px; }
         <div class="details" id="profile-details">—</div>
       </div>
       <div class="profile-actions">
-        <button class="btn btn-danger" id="btn-expel" style="display:none;">강퇴 처리</button>
+        <button class="btn btn-danger" id="btn-expel" style="display:none;">🚫 강퇴하기</button>
+        <button class="btn" id="btn-unban" style="display:none; background:#475569; color:#fff;">↩ 강퇴 해제</button>
       </div>
     </div>
   </div>
@@ -769,10 +836,20 @@ function computeStatus(byWeek) {
   return { key: 'on-track', label: '✓ 정상', cls: 'on-track' };
 }
 
+let currentStudent = null;
+
 function renderProfile(student, byWeek) {
+  currentStudent = student;
   const init = (student.nickname || '?').trim().charAt(0);
   document.getElementById('profile-avatar').textContent = init;
-  document.getElementById('profile-nick').textContent = student.nickname;
+  const nickEl = document.getElementById('profile-nick');
+  nickEl.textContent = student.nickname;
+  const oldPill = document.getElementById('banned-pill');
+  if (oldPill) oldPill.remove();
+  if (student.is_banned) {
+    nickEl.insertAdjacentHTML('afterend',
+      '<span class="banned-pill" id="banned-pill">🚫 강퇴됨</span>');
+  }
   document.getElementById('profile-kakao').textContent = `kakao_${student.kakao_id}`;
   document.getElementById('crumb-name').textContent = student.nickname;
   document.title = `${student.nickname} — 수강생 상세 · 재테크 라운지 관리자`;
@@ -789,7 +866,32 @@ function renderProfile(student, byWeek) {
     <span class="item">결제 · <b>3만원 (완주 시 환급 예정)</b></span>
   `;
 
-  if (status.key === 'late') document.getElementById('btn-expel').style.display = '';
+  // 강퇴/복구 버튼 토글
+  const btnExpel = document.getElementById('btn-expel');
+  const btnUnban = document.getElementById('btn-unban');
+  if (student.is_banned) {
+    btnExpel.style.display = 'none';
+    btnUnban.style.display = '';
+  } else {
+    btnExpel.style.display = '';
+    btnUnban.style.display = 'none';
+  }
+
+  // 강퇴된 학생이면 프로필 헤더에 빨간 배너
+  const oldBanner = document.getElementById('banned-banner');
+  if (oldBanner) oldBanner.remove();
+  if (student.is_banned) {
+    const banner = `
+      <div class="banned-banner" id="banned-banner">
+        <div class="icn">🚫</div>
+        <div class="body">
+          <b>이 수강생은 강퇴 처리된 상태예요.</b> 다음 로그인 시 차단되고, 강의실/과제 접근이 막혀요.
+          ${student.banned_at ? ` · ${fmtDateTime(student.banned_at)} 처리됨` : ''}
+          ${student.banned_reason ? `<div class="reason">${escapeHtml(student.banned_reason)}</div>` : ''}
+        </div>
+      </div>`;
+    document.querySelector('.profile-header .wrap').insertAdjacentHTML('beforeend', banner);
+  }
 }
 
 function renderQuickStats(byWeek) {
@@ -1068,7 +1170,91 @@ document.getElementById('logout-btn')?.addEventListener('click', (e) => {
   e.preventDefault();
   location.href = '/api/auth/logout';
 });
+
+// ===== 강퇴 / 복구 =====
+function openBanModal() {
+  const modal = document.getElementById('ban-modal');
+  document.getElementById('ban-reason').value = '';
+  document.getElementById('ban-target-nick').textContent = currentStudent?.nickname || '이 수강생';
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('ban-reason').focus(), 50);
+}
+function closeBanModal() {
+  document.getElementById('ban-modal').classList.remove('open');
+}
+
+async function submitBan() {
+  const reason = document.getElementById('ban-reason').value.trim();
+  const btn = document.getElementById('ban-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = '처리 중…';
+  try {
+    const res = await fetch('/api/admin/ban', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, banned: true, reason }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || '강퇴 실패');
+    }
+    closeBanModal();
+    await load();
+  } catch (e) {
+    alert('강퇴 처리 실패: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚫 강퇴 확정';
+  }
+}
+
+async function submitUnban() {
+  if (!confirm(`${currentStudent?.nickname || '이 수강생'}의 강퇴를 해제하시겠어요?\n다시 강의실에 접근할 수 있어요.`)) return;
+  const btn = document.getElementById('btn-unban');
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/admin/ban', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, banned: false }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || '해제 실패');
+    }
+    await load();
+  } catch (e) {
+    alert('강퇴 해제 실패: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('btn-expel')?.addEventListener('click', openBanModal);
+document.getElementById('btn-unban')?.addEventListener('click', submitUnban);
+document.getElementById('ban-cancel-btn')?.addEventListener('click', closeBanModal);
+document.getElementById('ban-confirm-btn')?.addEventListener('click', submitBan);
+document.getElementById('ban-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'ban-modal') closeBanModal();
+});
 </script>
+
+<!-- ===== 강퇴 확인 모달 ===== -->
+<div class="modal-backdrop" id="ban-modal">
+  <div class="modal-card">
+    <h3>🚫 강퇴 확인</h3>
+    <p class="modal-desc">
+      <b id="ban-target-nick">이 수강생</b>을(를) 강퇴하시겠어요?<br>
+      이 학생은 다음 페이지 이동/로그인 시 즉시 차단되고, 강의실·과제 접근이 모두 막혀요. 언제든 "강퇴 해제"로 복구할 수 있어요.
+    </p>
+    <label for="ban-reason">사유 <span style="color:var(--text-muted); font-weight:500;">(선택, 학생에게 표시됩니다)</span></label>
+    <textarea id="ban-reason" placeholder="예) 1주차 과제 미제출 + 연락 두절"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="ban-cancel-btn">취소</button>
+      <button class="btn btn-danger" id="ban-confirm-btn">🚫 강퇴 확정</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

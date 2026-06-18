@@ -1,5 +1,6 @@
-// 세션 헬퍼 — 쿠키 파싱 + JWT 검증
+// 세션 헬퍼 — 쿠키 파싱 + JWT 검증 + DB ban 게이트
 import { jwtVerify } from 'jose';
+import { getSupabase } from './supabase.js';
 
 export const COOKIE_NAME = 'jl_session';
 
@@ -39,12 +40,47 @@ export async function getSession(req) {
   }
 }
 
+// 강퇴된 사용자 확인 — banned면 { banned: true, reason }
+export async function checkBanned(userId) {
+  if (!userId) return { banned: false };
+  try {
+    const supabase = getSupabase();
+    const { data } = await supabase
+      .from('users')
+      .select('is_banned, banned_reason')
+      .eq('id', userId)
+      .maybeSingle();
+    if (data && data.is_banned) {
+      return { banned: true, reason: data.banned_reason || '' };
+    }
+    return { banned: false };
+  } catch {
+    return { banned: false };
+  }
+}
+
+// 강퇴 사용자 차단용 쿠키 만료 헤더
+function expireSessionCookie(res) {
+  res.setHeader(
+    'Set-Cookie',
+    `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`
+  );
+}
+
 // 인증 필수 — 무효면 401 응답 후 null 반환
 export async function requireSession(req, res) {
   const session = await getSession(req);
   if (!session) {
     res.setHeader('Cache-Control', 'no-store');
     res.status(401).json({ error: 'unauthenticated' });
+    return null;
+  }
+  // 강퇴 체크 (관리자는 어차피 banned 될 일 없지만 일관성 위해)
+  const ban = await checkBanned(session.userId);
+  if (ban.banned) {
+    expireSessionCookie(res);
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(403).json({ error: 'banned', reason: ban.reason });
     return null;
   }
   return session;

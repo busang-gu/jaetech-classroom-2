@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     // 모든 사용자 + 그들의 assignments 일괄 조회
     const { data: users, error: uErr } = await supabase
       .from('users')
-      .select('id, kakao_id, nickname, is_admin, last_login_at, created_at')
+      .select('id, kakao_id, nickname, is_admin, is_banned, banned_at, last_login_at, created_at')
       .order('created_at', { ascending: true });
     if (uErr) throw uErr;
 
@@ -46,6 +46,8 @@ export default async function handler(req, res) {
           id: u.id,
           kakao_id: u.kakao_id,
           nickname: u.nickname,
+          is_banned: !!u.is_banned,
+          banned_at: u.banned_at || null,
           last_login_at: u.last_login_at,
           created_at: u.created_at,
           weeks: w,

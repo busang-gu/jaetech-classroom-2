@@ -15,6 +15,11 @@
     const r = await fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' });
     if (!r.ok) throw new Error('unauth');
     const user = await r.json();
+    if (user.banned) {
+      const q = user.reason ? '?reason=' + encodeURIComponent(user.reason) : '';
+      location.replace('/banned.html' + q);
+      return;
+    }
     if (!user.isAdmin) {
       location.replace('/');
       return;
@@ -754,12 +759,12 @@ function renderTable() {
     const init = (s.nickname || '?').trim().charAt(0);
     const ac = avatarClass(s.kakao_id || s.id);
     return `
-      <tr>
+      <tr${s.is_banned ? ' style="background:#FEF2F2; opacity:0.7;"' : ''}>
         <td>
           <div class="student-name">
             <span class="avatar ${ac}">${escapeHtml(init)}</span>
             <div class="info">
-              <span class="nick">${escapeHtml(s.nickname)}</span>
+              <span class="nick">${escapeHtml(s.nickname)}${s.is_banned ? ' <span style="display:inline-block;padding:2px 8px;background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5;border-radius:999px;font-size:10px;font-weight:800;margin-left:4px;">🚫 강퇴</span>' : ''}</span>
               <span class="kakao-id">kakao_${escapeHtml(s.kakao_id)}</span>
             </div>
           </div>
