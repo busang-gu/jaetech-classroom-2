@@ -722,6 +722,92 @@ main { padding: 28px 0 80px; }
 .week3-line-chip:has(input:checked) {
   background: #f0fae9; border-color: #7ED957; color: #5A9E3F;
 }
+
+/* ===== Week4 — 대출 결과 박스 ===== */
+.week4-result-box {
+  background: linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1.5px solid #FCD34D;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+.week4-result-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+.week4-result-row + .week4-result-row {
+  border-top: 1px dashed rgba(180, 83, 9, 0.2);
+}
+.week4-result-row .lbl { color: #78350F; font-weight: 700; }
+.week4-result-row .val {
+  font-size: 18px; font-weight: 900; color: #B45309;
+  font-variant-numeric: tabular-nums;
+}
+.week4-result-row.hint .val { font-size: 14px; opacity: 0.85; }
+
+/* ===== Week4 — 최대 예산 (하이라이트) ===== */
+.week4-budget-big {
+  background: linear-gradient(135deg, #1a3d0e 0%, #2d5e1c 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 26px;
+  text-align: center;
+}
+.week4-budget-big .lbl {
+  font-size: 12px; font-weight: 800; letter-spacing: 0.04em;
+  color: #7ED957; margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.week4-budget-big .lbl small {
+  font-size: 10px; font-weight: 600; color: #a3d984;
+  text-transform: none; letter-spacing: 0;
+}
+.week4-budget-big .val {
+  font-size: clamp(28px, 4.5vw, 38px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.week4-budget-big .formula {
+  font-size: 12px; color: #a3d984;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Week4 — 후보 단지 입력 ===== */
+.week4-cand-list { display: grid; gap: 10px; }
+.week4-cand-row {
+  display: grid; gap: 8px;
+  grid-template-columns: 1fr;
+  padding: 12px;
+  background: #FAFCF7;
+  border: 1px solid #d8e3d2;
+  border-radius: 10px;
+  align-items: center;
+}
+@media (min-width: 720px) {
+  .week4-cand-row {
+    grid-template-columns: 60px 2fr 1.2fr 80px 100px;
+    gap: 10px;
+  }
+}
+.week4-cand-row .rank {
+  font-size: 11px; font-weight: 800; color: #5A9E3F;
+  background: #DCFCE7; padding: 4px 8px; border-radius: 6px;
+  text-align: center; white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.week4-cand-row input {
+  width: 100%; padding: 9px 11px;
+  border: 1.5px solid #d8e3d2; border-radius: 8px;
+  background: #fff; font-size: 13px; color: #1a3d0e;
+  font-family: inherit;
+}
+.week4-cand-row input:focus { outline: none; border-color: #7ED957; }
 </style>
 </head>
 <body>
@@ -1166,6 +1252,172 @@ main { padding: 28px 0 80px; }
       </div>
     </section>
 
+    <!-- ===== Section 4-A: 💰 내 자본금 (4주차 전용) ===== -->
+    <section class="section-card" id="section-week4-capital" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">1</span>
+        <h2 class="section-title">💰 내 자본금 — 현재 상황</h2>
+      </div>
+      <p class="section-desc">집 살 때 바로 동원할 수 있는 현금성 자산만. 정확하지 않아도 OK — 어림수로 채워주세요.</p>
+
+      <table class="field-table">
+        <thead>
+          <tr><th>항목</th><th>금액</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="label">예금 / CMA / 입출금</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="w4cap"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">적금 / 청약저축</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="w4cap"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">주식 / ETF / 코인 (현금화 가능)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="w4cap"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">부모님 지원 / 증여 <small style="color:#94a3b8;">(있다면)</small></td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="w4cap"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr>
+            <td class="label">기타 (전세 보증금 회수 등)</td>
+            <td class="input-cell"><input type="number" min="0" placeholder="0" data-group="w4cap"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+          <tr class="sum">
+            <td class="label">▶ 자본금 합계</td>
+            <td class="input-cell"><input type="number" readonly id="w4-cap-sum" placeholder="0"></td>
+            <td class="unit-cell">만원</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip-note">
+        <b>💡 자본금 = 즉시 매수에 동원 가능한 현금성 자산.</b> 부동산 시세나 비유동 자산은 일단 빼고 계산해요.
+      </div>
+    </section>
+
+    <!-- ===== Section 4-B: 🏦 대출 가능액 시뮬레이션 (4주차 전용) ===== -->
+    <section class="section-card" id="section-week4-loan" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">2</span>
+        <h2 class="section-title">🏦 대출 가능액 시뮬레이션</h2>
+      </div>
+      <p class="section-desc">노리는 집 가격 × LTV로 대출 가능액을 빠르게 추정해봐요. 실제 한도는 은행·정책대출별로 다르니 참고용.</p>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">🎯 노리는 집 가격</div>
+        <div class="week3-cond-grid-3">
+          <label class="week3-cond-field">
+            <span>예상 매수가 <small>(만원)</small></span>
+            <input type="number" min="0" placeholder="예: 50000" id="w4-target-price">
+          </label>
+          <label class="week3-cond-field">
+            <span>대출 종류</span>
+            <select id="w4-loan-type">
+              <option value="">선택</option>
+              <option value="일반 주담대">일반 주담대 (LTV 70%)</option>
+              <option value="보금자리론">보금자리론 (LTV 70%)</option>
+              <option value="디딤돌">디딤돌 대출 (LTV 70%)</option>
+              <option value="생애최초">생애최초 (LTV 80%)</option>
+              <option value="직접 입력">직접 입력</option>
+            </select>
+          </label>
+          <label class="week3-cond-field">
+            <span>적용 LTV <small>(%)</small></span>
+            <input type="number" min="0" max="100" placeholder="70" id="w4-ltv" value="70">
+          </label>
+        </div>
+        <p class="week3-cond-hint">※ LTV = 집값 대비 대출 비율. 일반 70% / 생애최초 80% / 규제지역은 낮을 수 있어요.</p>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">💵 내 소득 (DSR 참고용)</div>
+        <div class="week3-cond-grid-3">
+          <label class="week3-cond-field">
+            <span>세전 연봉 <small>(만원)</small></span>
+            <input type="number" min="0" placeholder="예: 5000" id="w4-income">
+          </label>
+          <label class="week3-cond-field">
+            <span>기존 부채 월 상환 <small>(만원, 학자금·신용 등)</small></span>
+            <input type="number" min="0" placeholder="0" id="w4-debt-monthly">
+          </label>
+          <label class="week3-cond-field">
+            <span>DSR 한도</span>
+            <input type="text" readonly value="40% (은행권 일반)" class="week3-readonly">
+          </label>
+        </div>
+      </div>
+
+      <div class="week4-result-box">
+        <div class="week4-result-row">
+          <span class="lbl">💸 받을 수 있는 대출 (LTV 기준)</span>
+          <span class="val" id="w4-loan-amount">— 만원</span>
+        </div>
+        <div class="week4-result-row hint">
+          <span class="lbl">📋 DSR 월 가용 상환액 (참고)</span>
+          <span class="val" id="w4-dsr-monthly">— 만원</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Section 4-C: 🎯 매수 가능 예산 + 후보 단지 (4주차 전용) ===== -->
+    <section class="section-card" id="section-week4-candidates" style="display:none;">
+      <div class="section-head">
+        <span class="section-num">3</span>
+        <h2 class="section-title">🎯 내 매수 가능 예산 + 관심 단지</h2>
+      </div>
+      <p class="section-desc">자본금 + 대출 = 내가 살 수 있는 집의 최대 가격. 이 예산에 맞는 단지를 프롭테크로 추려서 적어주세요.</p>
+
+      <div class="week4-budget-big">
+        <div class="lbl">내가 살 수 있는 집의 최대 가격 <small>(부대비용 4% 차감)</small></div>
+        <div class="val" id="w4-max-budget">— 만원</div>
+        <div class="formula">= (자본금 <span id="w4-formula-cap">0</span> + 대출 <span id="w4-formula-loan">0</span>) ÷ 1.04</div>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">📍 관심 단지 3곳 (프롭테크로 찾은 것)</div>
+        <p class="week3-cond-hint" style="margin-bottom: 14px;">※ 직방·호갱노노·아실 등에서 본 단지 중 마음에 드는 3곳을 적어주세요.</p>
+
+        <div class="week4-cand-list">
+          <div class="week4-cand-row">
+            <span class="rank">1순위</span>
+            <input type="text" placeholder="단지명 (예: 동탄역시범한화꿈에그린)" data-cand="0" data-field="name">
+            <input type="text" placeholder="지역·역" data-cand="0" data-field="region">
+            <input type="text" placeholder="평형 (예: 33평)" data-cand="0" data-field="size">
+            <input type="number" placeholder="호가 만원" data-cand="0" data-field="price">
+          </div>
+          <div class="week4-cand-row">
+            <span class="rank">2순위</span>
+            <input type="text" placeholder="단지명" data-cand="1" data-field="name">
+            <input type="text" placeholder="지역·역" data-cand="1" data-field="region">
+            <input type="text" placeholder="평형" data-cand="1" data-field="size">
+            <input type="number" placeholder="호가 만원" data-cand="1" data-field="price">
+          </div>
+          <div class="week4-cand-row">
+            <span class="rank">3순위</span>
+            <input type="text" placeholder="단지명" data-cand="2" data-field="name">
+            <input type="text" placeholder="지역·역" data-cand="2" data-field="region">
+            <input type="text" placeholder="평형" data-cand="2" data-field="size">
+            <input type="number" placeholder="호가 만원" data-cand="2" data-field="price">
+          </div>
+        </div>
+      </div>
+
+      <div class="week3-cond-block">
+        <div class="week3-cond-title">🗒 임장 계획 / 메모 <small style="font-weight: 500; color: #94a3b8;">(선택)</small></div>
+        <label class="week3-cond-field">
+          <textarea class="week3-textarea" id="w4-memo" rows="3" placeholder="예) 1순위는 다음 주말 임장 예정. 2순위는 9호선 라인 추가 조사 필요."></textarea>
+        </label>
+      </div>
+    </section>
+
     <!-- ===== Section 3: 인증 글 ===== -->
     <section class="section-card">
       <div class="section-head">
@@ -1221,7 +1473,11 @@ const WEEK_META = {
     sub: '오늘 강의 3단(왜·어떻게·어떤)을 내 상황으로 옮겨 적어주세요. 4주차 단지 찾기에 그대로 쓸 거예요.',
     due: '6/21', template: null, form: 'week3',
   },
-  4: { title: '🔹 나만의 똘똘한 1채 찾기',   sub: '양식이 준비되면 다운로드 가능합니다. 우선 인증 글과 캡처로 제출해주세요.', due: '6/28', template: null, form: false },
+  4: {
+    title: '🔹 나만의 똘똘한 1채 찾기',
+    sub: '내 자본금 + 받을 수 있는 대출 = 살 수 있는 집의 가격. 직접 시뮬레이션해보고 후보 단지까지 추려봐요.',
+    due: '6/28', template: null, form: 'week4',
+  },
 };
 const WEEK = parseInt(new URLSearchParams(location.search).get('week') || '1', 10) || 1;
 const META = WEEK_META[WEEK] || WEEK_META[1];
@@ -1246,14 +1502,18 @@ const META = WEEK_META[WEEK] || WEEK_META[1];
   // 주차별 폼 표시/숨김
   const isWeek1 = META.form === 'week1';
   const isWeek3 = META.form === 'week3';
+  const isWeek4 = META.form === 'week4';
   document.getElementById('section-asset-table').style.display = isWeek1 ? '' : 'none';
   document.getElementById('section-roadmap').style.display = isWeek1 ? '' : 'none';
   document.getElementById('section-week3-why').style.display = isWeek3 ? '' : 'none';
   document.getElementById('section-week3-checks').style.display = isWeek3 ? '' : 'none';
   document.getElementById('section-week3-conditions').style.display = isWeek3 ? '' : 'none';
+  document.getElementById('section-week4-capital').style.display = isWeek4 ? '' : 'none';
+  document.getElementById('section-week4-loan').style.display = isWeek4 ? '' : 'none';
+  document.getElementById('section-week4-candidates').style.display = isWeek4 ? '' : 'none';
 
   // 양식 다운로드 안내 (자체 폼 없고 + template 있는 주차)
-  const hasOwnForm = isWeek1 || isWeek3;
+  const hasOwnForm = isWeek1 || isWeek3 || isWeek4;
   const showForm = hasOwnForm; // 호환용 (아래 로직에서 사용)
   const notice = document.getElementById('section-template-notice');
   if (!hasOwnForm && META.template) {
@@ -1347,6 +1607,65 @@ function recalcWeek3Budget() {
 }
 ['w3-budget-own', 'w3-budget-loan'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', recalcWeek3Budget);
+});
+
+// ===== Week4 — 자본금 합계 자동 =====
+function recalcW4Capital() {
+  let total = 0;
+  document.querySelectorAll('input[data-group="w4cap"]').forEach(i => {
+    const v = parseFloat(i.value);
+    if (!isNaN(v)) total += v;
+  });
+  const el = document.getElementById('w4-cap-sum');
+  if (el) el.value = total || '';
+  recalcW4Budget();
+}
+document.querySelectorAll('input[data-group="w4cap"]').forEach(i => {
+  i.addEventListener('input', recalcW4Capital);
+});
+
+// ===== Week4 — 대출 가능액 시뮬레이션 + 매수 가능 예산 =====
+function recalcW4Budget() {
+  const cap = parseFloat(document.getElementById('w4-cap-sum')?.value) || 0;
+  const target = parseFloat(document.getElementById('w4-target-price')?.value) || 0;
+  const ltv = parseFloat(document.getElementById('w4-ltv')?.value) || 0;
+  const income = parseFloat(document.getElementById('w4-income')?.value) || 0;
+  const debtMonthly = parseFloat(document.getElementById('w4-debt-monthly')?.value) || 0;
+
+  // LTV 기반 대출 가능액
+  const loanByLtv = target > 0 && ltv > 0 ? Math.round(target * ltv / 100) : 0;
+  const loanEl = document.getElementById('w4-loan-amount');
+  if (loanEl) loanEl.textContent = loanByLtv > 0 ? loanByLtv.toLocaleString() + ' 만원' : '— 만원';
+
+  // DSR 참고 월 가용 상환액 = (연봉 × 40%) ÷ 12 − 기존 부채 월
+  const dsrMonthly = income > 0
+    ? Math.max(0, Math.round((income * 0.4) / 12) - debtMonthly)
+    : 0;
+  const dsrEl = document.getElementById('w4-dsr-monthly');
+  if (dsrEl) dsrEl.textContent = dsrMonthly > 0 ? dsrMonthly.toLocaleString() + ' 만원' : '— 만원';
+
+  // 매수 가능 예산 = (자본금 + 대출) ÷ 1.04
+  const totalCash = cap + loanByLtv;
+  const maxBudget = totalCash > 0 ? Math.round(totalCash / 1.04) : 0;
+  const budgetEl = document.getElementById('w4-max-budget');
+  if (budgetEl) budgetEl.textContent = maxBudget > 0 ? maxBudget.toLocaleString() + ' 만원' : '— 만원';
+
+  const fc = document.getElementById('w4-formula-cap');
+  const fl = document.getElementById('w4-formula-loan');
+  if (fc) fc.textContent = cap.toLocaleString();
+  if (fl) fl.textContent = loanByLtv.toLocaleString();
+}
+['w4-target-price', 'w4-ltv', 'w4-income', 'w4-debt-monthly'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', recalcW4Budget);
+});
+
+// 대출 종류 select → LTV 자동 매핑
+document.getElementById('w4-loan-type')?.addEventListener('change', (e) => {
+  const map = { '일반 주담대': 70, '보금자리론': 70, '디딤돌': 70, '생애최초': 80 };
+  if (map[e.target.value]) {
+    document.getElementById('w4-ltv').value = map[e.target.value];
+    recalcW4Budget();
+  }
 });
 
 // ===== 글자 수 카운터 =====
@@ -1497,9 +1816,34 @@ function collectWeek3Data() {
   };
 }
 
+function collectWeek4Data() {
+  const val = (id) => document.getElementById(id)?.value || '';
+  const capInputs = Array.from(document.querySelectorAll('input[data-group="w4cap"]'))
+    .map(i => parseFloat(i.value) || 0);
+  const candidates = [0, 1, 2].map(idx => ({
+    name: document.querySelector(`input[data-cand="${idx}"][data-field="name"]`)?.value || '',
+    region: document.querySelector(`input[data-cand="${idx}"][data-field="region"]`)?.value || '',
+    size: document.querySelector(`input[data-cand="${idx}"][data-field="size"]`)?.value || '',
+    price: document.querySelector(`input[data-cand="${idx}"][data-field="price"]`)?.value || '',
+  }));
+  return {
+    capital: capInputs,
+    loan: {
+      targetPrice: val('w4-target-price'),
+      loanType: val('w4-loan-type'),
+      ltv: val('w4-ltv'),
+      income: val('w4-income'),
+      debtMonthly: val('w4-debt-monthly'),
+    },
+    candidates,
+    memo: val('w4-memo'),
+  };
+}
+
 function collectFormData() {
   if (META.form === 'week1') return collectWeek1Data();
   if (META.form === 'week3') return collectWeek3Data();
+  if (META.form === 'week4') return collectWeek4Data();
   return {};
 }
 
@@ -1556,10 +1900,42 @@ function fillWeek3(fd) {
   recalcWeek3Budget();
 }
 
+function fillWeek4(fd) {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+
+  // 자본금 5칸
+  const capInputs = document.querySelectorAll('input[data-group="w4cap"]');
+  (fd.capital || []).forEach((v, i) => {
+    if (capInputs[i] && v != null && v !== 0) capInputs[i].value = v;
+  });
+
+  // 대출 시뮬
+  const l = fd.loan || {};
+  set('w4-target-price', l.targetPrice);
+  set('w4-loan-type', l.loanType);
+  set('w4-ltv', l.ltv || '70');
+  set('w4-income', l.income);
+  set('w4-debt-monthly', l.debtMonthly);
+
+  // 후보 단지
+  (fd.candidates || []).forEach((c, idx) => {
+    ['name', 'region', 'size', 'price'].forEach(field => {
+      const el = document.querySelector(`input[data-cand="${idx}"][data-field="${field}"]`);
+      if (el) el.value = c[field] || '';
+    });
+  });
+
+  set('w4-memo', fd.memo);
+
+  recalcW4Capital();
+  recalcW4Budget();
+}
+
 function fillForm(a) {
   const fd = a.form_data || {};
   if (META.form === 'week1') fillWeek1(fd);
   if (META.form === 'week3') fillWeek3(fd);
+  if (META.form === 'week4') fillWeek4(fd);
 
   proof.value = a.proof_text || '';
 
